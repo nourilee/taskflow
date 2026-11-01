@@ -3,5 +3,6 @@ declare const mockRouter: {
   replace: jest.Mock;
   back: jest.Mock;
   dismissTo: jest.Mock;
+  canDismiss: jest.Mock;
 };
 declare function setRouteParams(params: Record<string, string>): void;

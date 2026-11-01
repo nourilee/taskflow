@@ -3,6 +3,7 @@ const mockRouter = {
   replace: jest.fn(),
   back: jest.fn(),
   dismissTo: jest.fn(),
+  canDismiss: jest.fn(),
 };
 let mockParams = {};
 
