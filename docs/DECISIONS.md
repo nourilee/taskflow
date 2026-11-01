@@ -43,3 +43,16 @@
 - Prisma's `mode: "insensitive"` is unavailable on SQLite, so case-insensitive title search needs another approach and a test covering non-ASCII titles.
 - SQLite allows one writer at a time, which affects concurrent-update tests and limits what k6 write results show.
 - A deployed API needs a persistent disk and cannot run as multiple instances.
+
+## ADR-007: Task rules and API conventions
+
+**Decision:** Allow only `PENDING` to `IN_PROGRESS`, `IN_PROGRESS` to `COMPLETED`, and `COMPLETED` to `PENDING`. Blocked changes return `409`. Validation failures return `400`, and `422` is not used. "Today" comes from an injected clock using `APP_TIMEZONE`, defaulting to UTC. Title search uses the `titleNormalized` column, which stores a lowercased title with `%` and `_` replaced by private-use characters. Reset and seed are scripts, not HTTP routes.
+
+**Reason:** The product owner approved the explicit transition rule. SQLite's `LIKE` only ignores case for ASCII, and Prisma's `contains` does not escape `%` and `_` on SQLite, so the encoded column keeps search correct, without raw SQL, while pagination stays in the database.
+
+**Consequences:**
+
+- A task cannot go straight from `PENDING` to `COMPLETED`.
+- A user far from `APP_TIMEZONE` can have a date rejected near midnight.
+- Changing how titles are encoded requires rewriting `titleNormalized` for existing rows.
+- Status changes check then write, so two racing requests can both succeed. The final state is still valid.

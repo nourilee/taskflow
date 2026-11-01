@@ -8,16 +8,28 @@
     "build": "tsc -p tsconfig.build.json",
     "start": "node --env-file-if-exists=../../.env dist/server.js",
     "typecheck": "tsc --noEmit",
-    "test": "vitest run"
+    "test": "vitest run",
+    "test:integration": "vitest run --config vitest.integration.config.ts",
+    "db:generate": "prisma generate",
+    "db:migrate": "prisma migrate dev",
+    "db:deploy": "prisma migrate deploy",
+    "db:seed": "tsx --env-file-if-exists=../../.env src/test-support/seed.ts",
+    "db:test:reset": "tsx --env-file-if-exists=../../.env src/test-support/reset-test-database.ts"
   },
   "dependencies": {
+    "@prisma/adapter-better-sqlite3": "7.10.1",
+    "@prisma/client": "7.10.1",
     "@taskflow/shared": "workspace:*",
-    "express": "^5.3.0"
+    "express": "^5.3.0",
+    "swagger-ui-express": "^5.0.1",
+    "zod": "catalog:"
   },
   "devDependencies": {
     "@types/express": "^5.0.6",
     "@types/node": "^26.0.0",
     "@types/supertest": "^7.0.0",
+    "@types/swagger-ui-express": "^4.1.8",
+    "prisma": "7.10.1",
     "supertest": "^7.3.1",
     "tsx": "^4.23.15",
     "typescript": "catalog:",

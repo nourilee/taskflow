@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { healthResponseSchema } from './health.js';
 
-const valid = { status: 'ok', service: 'taskflow-api', uptimeSeconds: 12.5 };
+const valid = { status: 'ok', service: 'taskflow-api', database: 'ok', uptimeSeconds: 12.5 };
 
 describe('healthResponseSchema', () => {
   it('accepts a valid health response', () => {
@@ -12,7 +12,8 @@ describe('healthResponseSchema', () => {
     ['an unexpected status', { ...valid, status: 'down' }],
     ['an empty service name', { ...valid, service: '' }],
     ['negative uptime', { ...valid, uptimeSeconds: -1 }],
-    ['missing uptime', { status: 'ok', service: 'taskflow-api' }],
+    ['missing uptime', { status: 'ok', service: 'taskflow-api', database: 'ok' }],
+    ['missing database', { status: 'ok', service: 'taskflow-api', uptimeSeconds: 1 }],
   ])('rejects %s', (_name, input) => {
     expect(healthResponseSchema.safeParse(input).success).toBe(false);
   });

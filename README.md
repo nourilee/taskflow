@@ -30,7 +30,7 @@ Users can create, view, update, complete, reopen, and delete tasks without signi
 
 ## Repository status
 
-Phase 1 (foundation) is in place: a runnable monorepo with an API health endpoint and placeholder web and mobile apps. Task features start in Phase 2. Build incrementally and keep each phase runnable.
+Phases 1 and 2 are in place: a monorepo with the full task REST API on SQLite, and placeholder web and mobile apps. Task screens start in Phase 3. Build incrementally and keep each phase runnable.
 
 ## Getting started
 
@@ -38,9 +38,17 @@ Phase 1 (foundation) is in place: a runnable monorepo with an API health endpoin
 2. Install that Node version, then pnpm at the version in `package.json`.
 3. Run `pnpm install`.
 4. Copy `.env.example` to `.env`.
-5. Run `pnpm dev`, then open `http://localhost:3000/api/v1/health`.
+5. Run `pnpm --filter @taskflow/api db:deploy` to create the database.
+6. Optionally run `pnpm --filter @taskflow/api db:seed` to add sample tasks.
+7. Run `pnpm dev`, then open `http://localhost:3000/api/v1/docs`.
 
-Checks: `pnpm format:check`, `pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm build`.
+Checks: `pnpm format:check`, `pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm test:integration`, `pnpm build`, `pnpm test:api`.
+
+## Seed data
+
+`apps/api/src/test-support/seed-tasks.ts` defines six tasks with fixed IDs and timestamps, covering each status plus overdue, completed-past-due, future, and no-due-date cases. Seeding leaves tasks with other IDs in place and refuses to run when `NODE_ENV=production`.
+
+To reset the test database, run `NODE_ENV=test ENABLE_TEST_UTILITIES=true pnpm --filter @taskflow/api db:test:reset`. It refuses unless the target file is named `test.db` and differs from `DATABASE_URL`.
 
 Read `AGENTS.md` and the documents in `docs/` before making changes.
 

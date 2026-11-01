@@ -55,7 +55,7 @@ Duplicate titles are allowed. Do not impose title uniqueness.
 - `PENDING` → `IN_PROGRESS`: allowed
 - `IN_PROGRESS` → `COMPLETED`: allowed
 - `COMPLETED` → `PENDING`: allowed (reopen)
-- Other transitions should be evaluated against the same explicit rule set; the initial implementation may permit direct transitions only if the product owner approves. Prefer the simplest consistent rule and test it.
+- All other transitions are rejected, as approved by the product owner in ADR-007.
 
 ## 4. Create/Edit form
 

@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { ApiClientError, createApiClient } from './index.js';
 
 const baseUrl = 'http://api.test/api/v1';
-const health = { status: 'ok', service: 'taskflow-api', uptimeSeconds: 3 };
+const health = { status: 'ok', service: 'taskflow-api', database: 'ok', uptimeSeconds: 3 };
 
 function clientReturning(response: Response) {
   const fetch = vi.fn<typeof globalThis.fetch>().mockResolvedValue(response);

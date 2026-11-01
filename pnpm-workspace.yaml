@@ -1,9 +1,14 @@
 packages:
   - apps/*
   - packages/*
+  - tests/*
 
 allowBuilds:
+  '@scarf/scarf': false
+  '@prisma/engines': true
+  better-sqlite3: true
   esbuild: true
+  prisma: true
 
 # Versions shared by more than one workspace. React is pinned to the exact
 # version Expo SDK 58 expects, so web and mobile stay identical.

@@ -78,7 +78,7 @@ Keep controllers thin. Put business rules in service/domain functions. Keep data
 
 ## Time and dates
 
-Represent due dates as calendar dates, not timestamps, unless a time-of-day feature is introduced. Store audit timestamps in UTC. Inject a reference date/clock into overdue calculations to avoid tests depending on the actual current date.
+Represent due dates as calendar dates, not timestamps, unless a time-of-day feature is introduced. Store audit timestamps in UTC. Decide "today" from `APP_TIMEZONE` (default UTC). Inject a reference date/clock into overdue calculations to avoid tests depending on the actual current date.
 
 ## Native build approach
 

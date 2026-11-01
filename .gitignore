@@ -16,6 +16,12 @@ test-results/
 .DS_Store
 *.log
 *.tsbuildinfo
+*.db
+*.db-journal
+*.db-shm
+*.db-wal
+.test-data/
+apps/api/src/generated/
 *.apk
 *.aab
 *.ipa
