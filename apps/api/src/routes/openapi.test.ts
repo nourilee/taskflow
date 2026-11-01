@@ -45,6 +45,16 @@ describe('GET /api/v1/openapi.json', () => {
     }
   });
 
+  it('documents the error responses clients can receive', async () => {
+    const { body } = await api.get('/api/v1/openapi.json');
+
+    expect(body.paths['/tasks'].get.responses).toHaveProperty('500');
+    expect(body.paths['/tasks'].get.responses).not.toHaveProperty('413');
+    expect(body.paths['/tasks'].post.responses).toHaveProperty('413');
+    expect(body.paths['/tasks/{id}'].put.responses).toHaveProperty('413');
+    expect(body.paths['/tasks/{id}'].parameters).toHaveLength(1);
+  });
+
   it('carries request limits from the shared schemas', async () => {
     const { body } = await api.get('/api/v1/openapi.json');
     const { properties, required } = body.components.schemas.CreateTaskRequest;

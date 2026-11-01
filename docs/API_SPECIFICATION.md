@@ -27,7 +27,7 @@ Base path: `/api/v1`
 - `page`: optional, default 1
 - `limit`: optional, default 20, maximum 100
 
-Unknown parameters and out-of-range values return `400 VALIDATION_ERROR`.
+Unknown parameters, out-of-range values, and an empty `search` return `400 VALIDATION_ERROR`. Clients omit `search` when there is no term.
 
 ## List response
 

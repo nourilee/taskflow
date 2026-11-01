@@ -35,7 +35,6 @@ taskflow/
     api-client/      # typed API client
   docs/
   prompts/
-  scripts/
   .github/workflows/
   pnpm-workspace.yaml
   turbo.json

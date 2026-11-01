@@ -50,13 +50,13 @@ Phases 1 and 2 are in place: a monorepo with the full task REST API on SQLite, a
 
 Checks: `pnpm format:check`, `pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm test:integration`, `pnpm build`.
 
+Read `AGENTS.md` and the documents in `docs/` before making changes. The phase plan is in `docs/IMPLEMENTATION_ROADMAP.md`.
+
 ## Seed data
 
 `apps/api/src/test-support/seed-tasks.ts` defines six tasks with fixed IDs and timestamps, covering each status plus overdue, completed-past-due, future, and no-due-date cases. Seeding leaves tasks with other IDs in place and refuses to run when `NODE_ENV=production`.
 
 To reset the test database, run `NODE_ENV=test ENABLE_TEST_UTILITIES=true pnpm --filter @taskflow/api db:test:reset`. It refuses unless the target file is named `test.db` and differs from `DATABASE_URL`.
-
-Read `AGENTS.md` and the documents in `docs/` before making changes.
 
 ## Important rules
 
@@ -68,15 +68,3 @@ Read `AGENTS.md` and the documents in `docs/` before making changes.
 - Do not commit secrets, signing certificates, provisioning profiles, or real credentials.
 - Do not claim an IPA is distributable unless it is correctly signed and provisioned.
 - Add tests with each feature; do not defer all testing until the end.
-
-## Suggested first milestone
-
-A local monorepo skeleton with:
-
-- pnpm workspace and Turborepo configuration
-- `apps/web`, `apps/mobile`, `apps/api`
-- `packages/shared`, `packages/api-client`
-- TypeScript, linting, formatting, and a basic CI workflow
-- a successful local build/typecheck/test command (even if initial tests are minimal)
-
-See `docs/IMPLEMENTATION_ROADMAP.md`.
