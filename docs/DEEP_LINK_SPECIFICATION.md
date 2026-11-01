@@ -42,7 +42,7 @@ The HTTPS host is a placeholder until a domain controlled by the project owner i
 - **Mobile custom scheme:** `taskflow://tasks/{taskId}` is implemented through Expo Router. Unknown tasks show not-found, and malformed links fall back to the dashboard.
 - **HTTPS App Links and Universal Links:** not configured, because no domain is owned yet.
 
-On the iOS simulator, `xcrun simctl openurl` shows an `Open in "TaskFlow"?` prompt for this custom scheme, even when the app is in the foreground. Tap Open to continue, or allow for that step in automation.
+On the iOS simulator, `xcrun simctl openurl` shows an `Open in "TaskFlow"?` prompt for this custom scheme, even when the app is in the foreground. After Open is tapped once, later links open without it. A simulator that has not accepted the prompt needs that first tap.
 
 ## Important setup note
 

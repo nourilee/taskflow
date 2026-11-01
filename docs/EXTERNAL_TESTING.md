@@ -24,19 +24,13 @@ The API listens on `PORT` (default 3000), with base URL `http://localhost:3000/a
 
 ## Reset test data
 
-Run the reset command again at any time, including while the test API is running:
-
-```sh
-NODE_ENV=test ENABLE_TEST_UTILITIES=true pnpm --filter @taskflow/api db:test:reset
-```
-
-It applies migrations, deletes all tasks, and reloads the seed data. It refuses to run unless `NODE_ENV=test`, `ENABLE_TEST_UTILITIES=true`, the target file is named `test.db`, and the target differs from `DATABASE_URL`. There are no reset or seed HTTP routes.
+Run the `db:test:reset` command above again at any time, including while the test API is running. It applies migrations, deletes all tasks, and reloads the seed data. It refuses to run unless `NODE_ENV=test`, `ENABLE_TEST_UTILITIES=true`, the target file is named `test.db`, and the target differs from `DATABASE_URL`. There are no reset or seed HTTP routes.
 
 To reset a test database at another path, set `TEST_DATABASE_URL` for the reset command and `DATABASE_URL` for the API to the same file. The file must be named `test.db`.
 
 ## Seed data
 
-Six tasks with fixed IDs and timestamps. Treat them as read-only in parallel suites, and create unique records for tests that change data.
+Six tasks with fixed IDs and timestamps, defined in `apps/api/src/test-support/seed-tasks.ts`. Run `pnpm --filter @taskflow/api db:seed` to add them to a development database; it leaves other tasks in place and refuses to run in production. Treat them as read-only in parallel suites, and create unique records for tests that change data.
 
 | ID                         | Status        | Priority | Due date     | Case                       |
 | -------------------------- | ------------- | -------- | ------------ | -------------------------- |

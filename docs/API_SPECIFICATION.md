@@ -123,7 +123,7 @@ Do not expose stack traces or internal database details to clients.
 
 ## Test utilities
 
-There are no test reset or seed HTTP routes. Reset and seed are scripts in `apps/api/src/test-support`, excluded from the production build. Before any destructive action, `assertTestDatabase` requires `NODE_ENV=test`, `ENABLE_TEST_UTILITIES=true`, a target file named `test.db`, and a target different from `DATABASE_URL`.
+There are no test reset or seed HTTP routes. See `docs/EXTERNAL_TESTING.md` for the scripts and their safeguards.
 
 ## API coverage expectations
 
