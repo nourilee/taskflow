@@ -12,6 +12,7 @@ const port = Number(process.env.PORT ?? 3000);
 const app = createApp({
   repository: new PrismaTaskRepository(createPrismaClient(databaseUrl)),
   clock: createSystemClock(process.env.APP_TIMEZONE ?? 'UTC'),
+  corsOrigins: (process.env.CORS_ORIGINS ?? 'http://localhost:5173').split(','),
 });
 
 app.listen(port, () => {

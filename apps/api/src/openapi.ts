@@ -1,4 +1,5 @@
 import {
+  apiErrorSchema,
   changeTaskStatusSchema,
   createTaskSchema,
   healthResponseSchema,
@@ -37,15 +38,6 @@ const idParameter = {
   required: true,
   schema: { type: 'string' },
 };
-
-const errorSchema = z.object({
-  error: z.object({
-    code: z.string(),
-    message: z.string(),
-    details: z.array(z.object({ field: z.string(), message: z.string() })).optional(),
-    requestId: z.string(),
-  }),
-});
 
 function queryParameter(name: string, schema: object, description: string) {
   return { name, in: 'query', required: false, description, schema };
@@ -165,7 +157,7 @@ export const openApiDocument = {
       CreateTaskRequest: jsonSchema(createTaskSchema, 'input'),
       UpdateTaskRequest: jsonSchema(updateTaskSchema, 'input'),
       ChangeTaskStatusRequest: jsonSchema(changeTaskStatusSchema, 'input'),
-      Error: jsonSchema(errorSchema),
+      Error: jsonSchema(apiErrorSchema),
     },
   },
 };

@@ -58,6 +58,7 @@ Poll `GET /api/v1/health` until it returns `200` before starting a suite. It ret
 | `PORT`                     | API port                                        |
 | `DATABASE_URL`             | SQLite file used by the API                     |
 | `TEST_DATABASE_URL`        | SQLite file targeted by the reset command       |
+| `CORS_ORIGINS`             | Browser origins allowed to call the API         |
 | `APP_TIMEZONE`             | Timezone that decides today's date; default UTC |
 | `VITE_API_BASE_URL`        | API URL for the web app, set at build time      |
 | `EXPO_PUBLIC_API_BASE_URL` | API URL for the mobile app, set at build time   |
@@ -69,7 +70,29 @@ Poll `GET /api/v1/health` until it returns `200` before starting a suite. It ret
 - Web elements use `data-testid`, and mobile elements use `testID` with accessibility labels. Prefer role and label locators where available.
 - Dates are `YYYY-MM-DD`. Compute "today" in `APP_TIMEZONE`, or use dates far from the boundary.
 
+## Run the web app
+
+The web app reads `VITE_API_BASE_URL` at build time. The API only accepts browser calls from origins in `CORS_ORIGINS`, which defaults to `http://localhost:5173`. If the web app runs elsewhere, add that origin.
+
+```sh
+pnpm --filter @taskflow/web dev
+```
+
+Routes: `/` (dashboard), `/tasks/new`, `/tasks/{taskId}`, and `/tasks/{taskId}/edit`. Unknown paths redirect to the dashboard. Dashboard filters live in the URL as `status`, `search`, `order`, and `page`.
+
+## Web test identifiers
+
+Prefer role and label locators. These `data-testid` values are a stable contract:
+
+| Area             | Values                                                                                                                                                                                                               |
+| ---------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| App              | `app-title`, `loading`, `load-error`, `retry`, `task-not-found`, `back-to-dashboard`                                                                                                                                 |
+| Dashboard        | `create-task`, `task-search`, `task-sort`, `task-list`, `task-card-{id}`, `task-overdue-{id}`, `empty-state`, `no-results`, `clear-filters`, `previous-page`, `next-page`, `page-indicator`                          |
+| Status filters   | `status-filter-{all,pending,in-progress,completed}`, with counts in `dashboard-summary-{all,pending,in-progress,completed}`                                                                                          |
+| Task Details     | `task-title`, `task-status`, `task-priority`, `task-due-date`, `task-description`, `task-created-at`, `task-updated-at`, `status-action-{pending,in-progress,completed}`, `edit-task`, `delete-task`, `action-error` |
+| Delete dialog    | `confirm-dialog`, `confirm-delete`, `cancel-delete`                                                                                                                                                                  |
+| Create/Edit form | `task-form`, `field-{title,description,priority,status,dueDate}`, `field-{name}-error`, `form-error`, `save-task`, `cancel-form`                                                                                     |
+
 ## Current limits
 
-- The web and mobile task screens arrive in Phases 3 and 4, so only placeholder identifiers exist today.
-- Browser calls from a different origin need CORS, which arrives in Phase 3.
+The mobile task screens arrive in Phase 4, so only placeholder identifiers exist there today.

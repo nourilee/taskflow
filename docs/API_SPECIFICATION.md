@@ -18,6 +18,8 @@ Base path: `/api/v1`
 
 `GET /health` is both the health and readiness check. It returns `200` only when the database responds, and `503 SERVICE_UNAVAILABLE` otherwise.
 
+Browser calls are accepted only from the comma-separated origins in `CORS_ORIGINS`, which defaults to `http://localhost:5173`. `X-Request-Id` is readable by those origins.
+
 ## List query parameters
 
 - `status`: optional status filter

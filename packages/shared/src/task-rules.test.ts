@@ -1,6 +1,12 @@
 import { describe, expect, it } from 'vitest';
 import { TASK_STATUSES, type TaskStatus } from './task.js';
-import { canTransition, isDueDateAllowed, isOverdue, normalizeTitle } from './task-rules.js';
+import {
+  canTransition,
+  isDueDateAllowed,
+  isOverdue,
+  nextStatuses,
+  normalizeTitle,
+} from './task-rules.js';
 
 const today = '2026-11-01';
 const yesterday = '2026-10-31';
@@ -22,6 +28,14 @@ describe('canTransition', () => {
 
   it.each(pairs)('%s to %s', (from, to) => {
     expect(canTransition(from, to)).toBe(isAllowed(from, to));
+  });
+});
+
+describe('nextStatuses', () => {
+  it.each(TASK_STATUSES)('lists only statuses %s can move to', (from) => {
+    const expected = TASK_STATUSES.filter((to) => canTransition(from, to));
+
+    expect(nextStatuses(from)).toEqual(expected);
   });
 });
 

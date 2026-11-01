@@ -36,7 +36,7 @@ See `docs/TEST_STRATEGY.md` for the boundary and `docs/EXTERNAL_TESTING.md` for 
 
 ## Repository status
 
-Phases 1 and 2 are in place: a monorepo with the full task REST API on SQLite, and placeholder web and mobile apps. Task screens start in Phase 3. Build incrementally and keep each phase runnable.
+Phases 1 to 3 are in place: a monorepo with the task REST API on SQLite, the web client, and a placeholder mobile app. Mobile screens start in Phase 4. Build incrementally and keep each phase runnable.
 
 ## Getting started
 
@@ -46,7 +46,7 @@ Phases 1 and 2 are in place: a monorepo with the full task REST API on SQLite, a
 4. Copy `.env.example` to `.env`.
 5. Run `pnpm --filter @taskflow/api db:deploy` to create the database.
 6. Optionally run `pnpm --filter @taskflow/api db:seed` to add sample tasks.
-7. Run `pnpm dev`, then open `http://localhost:3000/api/v1/docs`.
+7. Run `pnpm dev`, then open `http://localhost:5173` for the web app or `http://localhost:3000/api/v1/docs` for the API docs.
 
 Checks: `pnpm format:check`, `pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm test:integration`, `pnpm build`.
 

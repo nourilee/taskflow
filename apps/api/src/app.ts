@@ -1,3 +1,4 @@
+import cors from 'cors';
 import express, { type Express } from 'express';
 import swaggerUi from 'swagger-ui-express';
 import type { Clock } from './clock.js';
@@ -11,12 +12,14 @@ import { TaskService } from './tasks/task-service.js';
 export interface AppDependencies {
   repository: TaskRepository;
   clock: Clock;
+  corsOrigins?: string[];
 }
 
-export function createApp({ repository, clock }: AppDependencies): Express {
+export function createApp({ repository, clock, corsOrigins = [] }: AppDependencies): Express {
   const app = express();
 
   app.use(assignRequestId);
+  app.use(cors({ origin: corsOrigins, exposedHeaders: ['X-Request-Id'] }));
   app.use(express.json());
   app.use('/api/v1/health', createHealthRouter(repository));
   app.use('/api/v1/tasks', createTasksRouter(new TaskService(repository, clock)));
