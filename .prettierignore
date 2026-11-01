@@ -1,0 +1,5 @@
+dist
+coverage
+.expo
+.turbo
+pnpm-lock.yaml
