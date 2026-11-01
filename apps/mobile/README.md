@@ -43,8 +43,12 @@ With Xcode 27, `expo run:ios` can finish with a System Events error after `Build
 
 ## Tests
 
-`pnpm --filter @taskflow/mobile test` runs `jest-expo` with React Native Testing Library. `expo-router` is mocked, so route files, native alerts, and the native date picker need checking on a device.
+`pnpm --filter @taskflow/mobile test` runs `jest-expo` with React Native Testing Library. `expo-router` is mocked, so route files, native alerts, the native date picker, and theme changes in native UI need checking on a device.
+
+After changing a native dependency or `app.json`, run `pnpm --filter @taskflow/mobile exec expo prebuild --clean --no-install` before building.
+
+If an Android build fails with `cannot find symbol` for `RNGestureHandlerPackage`, the module's output is stale. Run `./gradlew :react-native-gesture-handler:clean` from `android/` and build again.
 
 ## Expo SDK 58 compatibility
 
-Dependencies match `expo install` for SDK 58 and the `expo-template-blank-typescript@58.0.31` template. `app.json` omits template icon and splash settings because the app has no assets yet. Expo packages inside pnpm's minimum release age are listed by exact version under `minimumReleaseAgeExclude` in `pnpm-workspace.yaml`; remove those entries once they age out.
+Dependencies match `expo install` for SDK 58 and the `expo-template-blank-typescript@58.0.31` template. Icons and the splash image are in `assets/`. Expo packages inside pnpm's minimum release age are listed by exact version under `minimumReleaseAgeExclude` in `pnpm-workspace.yaml`; remove those entries once they age out.

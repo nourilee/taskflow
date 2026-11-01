@@ -1,21 +1,28 @@
 import { errorMessage } from '@taskflow/api-client';
 import { router } from 'expo-router';
+import { CircleAlert, SearchX } from 'lucide-react-native';
 import { ActivityIndicator, Text, View } from 'react-native';
-import { colors, shared } from '../lib/theme';
+import { useSharedStyles } from '../lib/theme';
+import { useTheme } from '../lib/theme-context';
 import { Button } from './Button';
 
 export function Loading({ label }: { label: string }) {
+  const { colors } = useTheme();
+  const shared = useSharedStyles();
   return (
     <View style={shared.notice} testID="loading" accessibilityLabel={label}>
-      <ActivityIndicator color={colors.ink} />
+      <ActivityIndicator color={colors.primary} />
       <Text style={shared.body}>{label}</Text>
     </View>
   );
 }
 
 export function LoadError({ error, onRetry }: { error: unknown; onRetry(): void }) {
+  const { colors } = useTheme();
+  const shared = useSharedStyles();
   return (
     <View style={shared.notice} testID="load-error" accessibilityRole="alert">
+      <CircleAlert size={28} color={colors.danger} />
       <Text style={shared.body}>{errorMessage(error)}</Text>
       <Button label="Try again" testID="retry" onPress={onRetry} />
     </View>
@@ -23,8 +30,11 @@ export function LoadError({ error, onRetry }: { error: unknown; onRetry(): void 
 }
 
 export function TaskNotFound() {
+  const { colors } = useTheme();
+  const shared = useSharedStyles();
   return (
     <View style={shared.notice} testID="task-not-found">
+      <SearchX size={28} color={colors.primaryText} />
       <Text style={shared.heading} accessibilityRole="header">
         Task not found
       </Text>

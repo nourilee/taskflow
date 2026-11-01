@@ -22,6 +22,7 @@ A TypeScript monorepo with separate web and native mobile clients, a shared API,
 | Integration tests  | Vitest + Supertest                       |
 | Mobile navigation  | Expo Router                              |
 | Mobile unit tests  | jest-expo + React Native Testing Library |
+| Design tokens      | Plain TypeScript and generated CSS       |
 | CI/CD              | GitHub Actions                           |
 
 ## Repository layout
@@ -35,6 +36,7 @@ taskflow/
   packages/
     shared/          # domain types, schemas, business rules
     api-client/      # typed API client
+    design-tokens/   # colors, type, spacing, theme preference
   docs/
   prompts/
   .github/workflows/
@@ -52,6 +54,7 @@ taskflow/
 - `apps/api`: HTTP routing, request validation, services, persistence, OpenAPI.
 - `packages/shared`: domain types, schemas, pure business rules.
 - `packages/api-client`: shared typed transport client and API error handling.
+- `packages/design-tokens`: visual tokens and theme preference rules, used by the clients only. See `docs/DESIGN_SYSTEM.md`.
 - Tests live inside their application package. External automation lives in the TaskFlow Automation repository.
 
 ## API request flow

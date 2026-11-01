@@ -2,7 +2,6 @@ import {
   formatDate,
   isOverdue,
   LIST_DEFAULT_LIMIT,
-  PRIORITY_LABELS,
   STATUS_LABELS,
   statusSlug,
   taskStatusSchema,
@@ -11,8 +10,10 @@ import {
   type TaskListResponse,
   type TaskStatus,
 } from '@taskflow/shared';
+import { Calendar, ListTodo, Plus, Search, SearchX } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
 import { Link, useSearchParams } from 'react-router';
+import { OverdueBadge, PriorityIndicator, STATUS_ICONS, StatusBadge } from '../components/badges';
 import { LoadError, Loading, Notice } from '../components/states';
 import { useServices } from '../lib/app-context';
 import { useLoad } from '../lib/use-load';
@@ -34,7 +35,7 @@ function readFilters(params: URLSearchParams) {
   };
 }
 
-function StatusStrip({
+function SummaryCards({
   summary,
   active,
   onSelect,
@@ -44,60 +45,74 @@ function StatusStrip({
   onSelect(status: TaskStatus | undefined): void;
 }) {
   return (
-    <div className="strip" role="group" aria-label="Filter by status">
-      <button
-        type="button"
-        className="strip-all"
-        aria-pressed={active === undefined}
-        onClick={() => onSelect(undefined)}
-        data-testid="status-filter-all"
-      >
-        <span className="strip-count" data-testid="dashboard-summary-all">
-          {summary.all}
-        </span>
-        All
-      </button>
-      {TASK_STATUSES.map((status) => {
-        const count = summary[SUMMARY_KEYS[status]];
-        const slug = statusSlug(status);
-        return (
-          <button
+    <div className="summary">
+      <div className="summary-cards" role="group" aria-label="Filter by status">
+        <button
+          type="button"
+          className="summary-card"
+          aria-pressed={active === undefined}
+          onClick={() => onSelect(undefined)}
+          data-testid="status-filter-all"
+        >
+          <span className="summary-count" data-testid="dashboard-summary-all">
+            {summary.all}
+          </span>
+          <span className="summary-label">
+            <ListTodo aria-hidden size={16} className="tone-primary" />
+            Total tasks
+          </span>
+        </button>
+        {TASK_STATUSES.map((status) => {
+          const slug = statusSlug(status);
+          const Icon = STATUS_ICONS[status];
+          return (
+            <button
+              key={status}
+              type="button"
+              className="summary-card"
+              aria-pressed={active === status}
+              onClick={() => onSelect(status)}
+              data-testid={`status-filter-${slug}`}
+            >
+              <span className="summary-count" data-testid={`dashboard-summary-${slug}`}>
+                {summary[SUMMARY_KEYS[status]]}
+              </span>
+              <span className="summary-label">
+                <Icon aria-hidden size={16} className={`tone-${slug}`} />
+                {STATUS_LABELS[status]}
+              </span>
+            </button>
+          );
+        })}
+      </div>
+      <div className="flow-bar" aria-hidden>
+        {TASK_STATUSES.map((status) => (
+          <span
             key={status}
-            type="button"
-            className={`strip-segment tone-${slug}`}
-            style={{ flexGrow: Math.max(count, 1) }}
-            aria-pressed={active === status}
-            onClick={() => onSelect(status)}
-            data-testid={`status-filter-${slug}`}
-          >
-            <span className="strip-count" data-testid={`dashboard-summary-${slug}`}>
-              {count}
-            </span>
-            {STATUS_LABELS[status]}
-          </button>
-        );
-      })}
+            className={`flow-${statusSlug(status)}`}
+            style={{ flexGrow: summary[SUMMARY_KEYS[status]] }}
+          />
+        ))}
+      </div>
     </div>
   );
 }
 
 function TaskRow({ task, today }: { task: Task; today: string }) {
-  const overdue = isOverdue(task, today);
   return (
-    <li className={`task-row tone-${statusSlug(task.status)}`} data-testid={`task-card-${task.id}`}>
+    <li className="task-row" data-testid={`task-card-${task.id}`}>
       <Link to={`/tasks/${task.id}`} className="task-link">
         <span className="task-title">{task.title}</span>
         <span className="task-meta">
-          <span>{STATUS_LABELS[task.status]}</span>
-          <span>{PRIORITY_LABELS[task.priority]} priority</span>
-          <span>{task.dueDate ? `Due ${formatDate(task.dueDate)}` : 'No due date'}</span>
+          <StatusBadge status={task.status} />
+          <PriorityIndicator priority={task.priority} suffix=" priority" />
+          <span className="due-date">
+            <Calendar aria-hidden size={16} />
+            {task.dueDate ? `Due ${formatDate(task.dueDate)}` : 'No due date'}
+          </span>
         </span>
       </Link>
-      {overdue && (
-        <span className="overdue" data-testid={`task-overdue-${task.id}`}>
-          Overdue
-        </span>
-      )}
+      {isOverdue(task, today) && <OverdueBadge testId={`task-overdue-${task.id}`} />}
     </li>
   );
 }
@@ -159,8 +174,12 @@ export function Dashboard() {
   return (
     <>
       <div className="screen-header">
-        <h1>Tasks</h1>
+        <div>
+          <h1>Tasks</h1>
+          <p className="screen-description">Everything on your plate, in one place.</p>
+        </div>
         <Link className="button" to="/tasks/new" data-testid="create-task">
+          <Plus aria-hidden size={18} />
           Create task
         </Link>
       </div>
@@ -170,7 +189,7 @@ export function Dashboard() {
 
       {error === undefined && data && (
         <>
-          <StatusStrip
+          <SummaryCards
             summary={data.summary}
             active={status}
             onSelect={(next) => update({ status: next })}
@@ -179,12 +198,16 @@ export function Dashboard() {
           <div className="controls">
             <label className="field">
               <span>Search titles</span>
-              <input
-                type="search"
-                value={input}
-                onChange={(event) => setInput(event.target.value)}
-                data-testid="task-search"
-              />
+              <span className="search-input">
+                <Search aria-hidden size={18} />
+                <input
+                  type="search"
+                  placeholder="Find a task by title"
+                  value={input}
+                  onChange={(event) => setInput(event.target.value)}
+                  data-testid="task-search"
+                />
+              </span>
             </label>
             <label className="field">
               <span>Sort by due date</span>
@@ -201,6 +224,7 @@ export function Dashboard() {
 
           {data.summary.all === 0 && (
             <Notice testId="empty-state">
+              <ListTodo aria-hidden className="notice-icon" size={28} />
               <h2>No tasks yet</h2>
               <p>Create your first task to get started.</p>
             </Notice>
@@ -208,6 +232,7 @@ export function Dashboard() {
 
           {data.summary.all > 0 && data.items.length === 0 && (
             <Notice testId="no-results">
+              <SearchX aria-hidden className="notice-icon" size={28} />
               <h2>No matching tasks</h2>
               <p>Change your search or filter to see more tasks.</p>
               <button

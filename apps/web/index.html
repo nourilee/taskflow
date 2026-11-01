@@ -3,7 +3,24 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#F7F6FC" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <title>TaskFlow</title>
+    <!-- Runs before first paint, so the page never flashes the wrong theme. -->
+    <script>
+      (function () {
+        var preference;
+        try {
+          preference = localStorage.getItem('taskflow.theme');
+        } catch (error) {
+          preference = null;
+        }
+        var dark =
+          preference === 'dark' ||
+          (preference !== 'light' && matchMedia('(prefers-color-scheme: dark)').matches);
+        document.documentElement.dataset.theme = dark ? 'dark' : 'light';
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>
