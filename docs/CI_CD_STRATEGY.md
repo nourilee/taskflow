@@ -1,33 +1,19 @@
 # CI/CD Strategy
 
+This repository's CI/CD runs only unit tests, integration tests, code quality checks, type checks, and application builds. The TaskFlow Automation repository owns its own pipelines for API automation, web and mobile E2E, performance, cross-browser and cross-device testing, regression, and reporting. Those pipelines test published builds or a checked-out revision of this repository.
+
 ## Pull request pipeline
 
-Run fast feedback checks:
-
 1. Install dependencies with frozen lockfile.
-2. Lint and format check.
+2. Format check and lint.
 3. Typecheck.
-4. Unit and component tests.
-5. Build affected apps/packages.
-6. API smoke tests against an isolated test database.
-7. Web smoke tests where practical.
+4. Unit tests.
+5. Integration tests against an isolated test database.
+6. Build applications and packages.
 
 ## Main branch pipeline
 
-- Full unit/component suite.
-- API and integration regression.
-- Playwright web regression.
-- Publish reports and diagnostics.
-- Build web and API artifacts.
-
-## Nightly pipeline
-
-- Full web regression.
-- Android emulator/Appium suite.
-- iOS simulator/Appium suite on macOS runner.
-- Optional BrowserStack execution when credentials are configured.
-- k6 performance smoke/load profile.
-- Publish Allure and platform artifacts.
+Runs the same checks as the pull request pipeline.
 
 ## Release pipeline
 
@@ -42,7 +28,6 @@ Run fast feedback checks:
 
 Use GitHub Actions secrets/environment secrets for:
 
-- BrowserStack credentials
 - deployment credentials
 - EAS access token if used
 - Apple signing-related secrets where applicable
@@ -51,7 +36,5 @@ Never put secrets in workflow YAML, source files, documentation examples, or com
 
 ## Runner considerations
 
-- Web/API/unit tests can run on Linux runners.
-- Android emulator tests can run on suitable Linux runners, subject to emulator/KVM availability.
-- iOS simulator and IPA signing/builds require macOS tooling.
-- Real-device testing may use a device cloud such as BrowserStack.
+- Web/API/unit/integration work can run on Linux runners.
+- iOS IPA signing and builds require macOS tooling.

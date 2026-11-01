@@ -19,12 +19,8 @@ A TypeScript monorepo with separate web and native mobile clients, a shared API,
 | API documentation  | OpenAPI / Swagger UI               |
 | Unit tests         | Vitest                             |
 | Component tests    | React Testing Library              |
-| Web E2E            | Playwright                         |
-| Mobile E2E         | Appium + WebdriverIO + Mocha       |
-| API automation     | PactumJS                           |
-| Performance        | k6                                 |
+| Integration tests  | Vitest + Supertest                 |
 | CI/CD              | GitHub Actions                     |
-| Reporting          | Allure                             |
 
 ## Repository layout
 
@@ -37,11 +33,6 @@ taskflow/
   packages/
     shared/          # domain types, schemas, business rules
     api-client/      # typed API client
-  tests/
-    api/
-    web/
-    mobile/
-    performance/
   docs/
   prompts/
   scripts/
@@ -60,7 +51,7 @@ taskflow/
 - `apps/api`: HTTP routing, request validation, services, persistence, OpenAPI.
 - `packages/shared`: domain types, schemas, pure business rules.
 - `packages/api-client`: shared typed transport client and API error handling.
-- `tests`: cross-project automation suites and performance scripts.
+- Tests live inside their application package. External automation lives in the TaskFlow Automation repository.
 
 ## API request flow
 

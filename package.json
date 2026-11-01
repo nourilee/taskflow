@@ -12,7 +12,6 @@
     "typecheck": "turbo run typecheck",
     "test": "turbo run test",
     "test:integration": "turbo run test:integration",
-    "test:api": "turbo run test:api",
     "format": "prettier --write .",
     "format:check": "prettier --check ."
   },

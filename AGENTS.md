@@ -16,6 +16,7 @@ Before making changes, read:
 - `docs/DEEP_LINK_SPECIFICATION.md`
 - `docs/TEST_STRATEGY.md`
 - `docs/CI_CD_STRATEGY.md`
+- `docs/EXTERNAL_TESTING.md`
 - `docs/IMPLEMENTATION_ROADMAP.md`
 
 If documents conflict, do not silently choose. Identify the conflict and ask for a decision. Record approved changes in the relevant document.
@@ -42,6 +43,27 @@ If documents conflict, do not silently choose. Identify the conflict and ask for
 - Keep UI, domain/business rules, API transport, and persistence concerns separated.
 - Prefer simple, explicit abstractions over premature generalization.
 - Do not introduce microservices, authentication, queues, or unnecessary infrastructure.
+
+## Testing boundaries (permanent)
+
+TaskFlow has two repositories. This decision changes only with explicit owner approval.
+
+- **TaskFlow (this repository):** application code, unit tests, and integration tests.
+- **TaskFlow Automation (separate repository):** PactumJS, Playwright, Appium + WebdriverIO + Mocha, k6, Allure, cross-browser/device testing, and regression suites.
+
+In this repository:
+
+1. Do not add Playwright, Appium, WebdriverIO, PactumJS, k6, or Allure.
+2. Do not add E2E, API automation, mobile automation, or performance test directories.
+3. Do not add dependencies or scripts intended for external automation frameworks.
+4. Keep tests inside their application package, or a designated internal test directory.
+5. CI runs only unit tests, integration tests, code quality checks, type checks, and builds.
+6. Supertest route integration tests are internal. They are not external API automation.
+7. Do not build features solely to suit one external automation framework.
+
+Design for external testability instead: documented API contracts, predictable status codes and errors, stable `data-testid`/`testID` values, accessibility labels, deterministic seed/reset, isolated environments, and configurable base URLs. See `docs/EXTERNAL_TESTING.md`.
+
+Component tests count as unit tests. Use Vitest for pure logic. `jest-expo` is allowed for mobile component tests if Phase 4 confirms it is needed.
 
 ## Engineering rules
 

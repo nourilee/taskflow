@@ -1,6 +1,6 @@
-# TaskFlow — SDET Engineering Showcase
+# TaskFlow
 
-A small, no-authentication task management application built to demonstrate end-to-end software quality engineering across web, Android, iOS, API, and CI/CD.
+A small, no-authentication task management application for web, Android, and iOS, with a shared REST API. It is the system under test for a separate SDET automation portfolio.
 
 ## Product scope
 
@@ -20,13 +20,19 @@ Users can create, view, update, complete, reopen, and delete tasks without signi
 - API: Node.js + Express + TypeScript
 - Database: SQLite + Prisma (from Phase 2; PostgreSQL and Docker are a later optional enhancement, see ADR-006)
 - Validation: Zod
-- Unit/component tests: Vitest + React Testing Library
-- Web E2E: Playwright
-- Mobile E2E: Appium + WebdriverIO + Mocha
-- API automation: PactumJS
-- Performance: k6
+- Unit and integration tests: Vitest, React Testing Library, Supertest
 - CI/CD: GitHub Actions
-- Reporting: Allure
+
+## Two-repository testing approach
+
+| Repository                     | Responsibility                                                                                                                           |
+| ------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| TaskFlow (this repository)     | Application code, unit tests, integration tests, and application CI/CD                                                                   |
+| TaskFlow Automation (separate) | API automation, web and mobile E2E, performance, cross-browser and cross-device testing, regression suites, reporting, and its own CI/CD |
+
+The TaskFlow Automation repository independently validates TaskFlow as an external consumer. It does not import application code or rely on internal tests, and it uses only the public API, the user interfaces, and the documented test data setup commands. Passing internal tests never replaces external validation, and external tests never replace internal ones.
+
+See `docs/TEST_STRATEGY.md` for the boundary and `docs/EXTERNAL_TESTING.md` for integration details.
 
 ## Repository status
 
@@ -42,7 +48,7 @@ Phases 1 and 2 are in place: a monorepo with the full task REST API on SQLite, a
 6. Optionally run `pnpm --filter @taskflow/api db:seed` to add sample tasks.
 7. Run `pnpm dev`, then open `http://localhost:3000/api/v1/docs`.
 
-Checks: `pnpm format:check`, `pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm test:integration`, `pnpm build`, `pnpm test:api`.
+Checks: `pnpm format:check`, `pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm test:integration`, `pnpm build`.
 
 ## Seed data
 

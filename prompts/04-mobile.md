@@ -12,8 +12,8 @@ Requirements:
 - Stable `testID` values and meaningful accessibility labels.
 - Loading, empty, error, retry, validation, and not-found states.
 - Native date picker and platform-appropriate controls.
-- Configure native builds so Appium can automate installed app binaries.
+- Configure installable Android and iOS simulator builds.
 
 Do not claim verified Universal Links/App Links until a real domain and association files are configured. Do not claim a distributable iOS IPA without signing/provisioning.
 
-Add or update mobile component/unit tests where practical and Appium/WebdriverIO smoke tests. Present a plan first and report actual build/test results.
+Add or update mobile unit tests where practical. Do not add Appium or other external automation; see the testing boundaries in `AGENTS.md`. Present a plan first and report actual build/test results.

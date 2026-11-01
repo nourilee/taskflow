@@ -16,6 +16,8 @@ Base path: `/api/v1`
 | GET    | `/openapi.json`     | OpenAPI document             |
 | GET    | `/docs`             | Swagger UI                   |
 
+`GET /health` is both the health and readiness check. It returns `200` only when the database responds, and `503 SERVICE_UNAVAILABLE` otherwise.
+
 ## List query parameters
 
 - `status`: optional status filter
@@ -121,6 +123,8 @@ Do not expose stack traces or internal database details to clients.
 
 There are no test reset or seed HTTP routes. Reset and seed are scripts in `apps/api/src/test-support`, excluded from the production build. Before any destructive action, `assertTestDatabase` requires `NODE_ENV=test`, `ENABLE_TEST_UTILITIES=true`, a target file named `test.db`, and a target different from `DATABASE_URL`.
 
-## API test coverage
+## API coverage expectations
+
+This list applies to internal Supertest integration tests and to external automation in the TaskFlow Automation repository.
 
 Positive CRUD; missing/invalid fields; title/description boundaries; invalid enum values; malformed JSON; unknown IDs; date boundaries; filtering/sorting/pagination; persistence; delete behavior; status rules; concurrent update behavior; database unavailable; server error behavior.

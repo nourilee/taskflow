@@ -22,4 +22,3 @@ jobs:
       - run: pnpm test
       - run: pnpm test:integration
       - run: pnpm build
-      - run: pnpm test:api

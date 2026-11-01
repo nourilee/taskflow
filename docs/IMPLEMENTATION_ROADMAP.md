@@ -2,6 +2,8 @@
 
 Build in vertical slices. Each phase must leave the repository in a working state.
 
+This roadmap covers the TaskFlow application only. External automation is implemented in the separate TaskFlow Automation repository and is not part of this roadmap.
+
 ## Phase 1 — Foundation
 
 - Initialize pnpm monorepo and Turborepo.
@@ -21,7 +23,7 @@ Build in vertical slices. Each phase must leave the repository in a working stat
 - Implement shared Zod schemas and pure business rules.
 - Implement CRUD/status API.
 - Implement consistent error handling and OpenAPI.
-- Add unit, integration, and PactumJS tests.
+- Add unit and integration tests.
 - Add test-only reset/seed safeguards.
 
 **Exit criteria:** API behavior and rules covered by automated tests; Swagger usable; test database reset reproducible.
@@ -33,9 +35,9 @@ Build in vertical slices. Each phase must leave the repository in a working stat
 - Add loading, empty, error, retry, validation, and not-found states.
 - Add web deep-link route.
 - Add accessible semantics and stable test IDs.
-- Add component and Playwright tests.
+- Add component tests.
 
-**Exit criteria:** Main user journeys pass in browser and use persisted API data.
+**Exit criteria:** Internal tests pass, and main user journeys were manually confirmed in a browser against persisted API data.
 
 ## Phase 4 — Mobile client
 
@@ -44,29 +46,23 @@ Build in vertical slices. Each phase must leave the repository in a working stat
 - Add native navigation and custom URL scheme.
 - Add testID/accessibility identifiers.
 - Configure Android/iOS native build profiles.
-- Add Appium/WebdriverIO smoke tests.
+- Add mobile unit tests where practical.
 
-**Exit criteria:** App installs/runs on Android and iOS simulator; core flows work; custom-scheme deep links pass.
+**Exit criteria:** Internal tests pass, and the app and custom-scheme deep links were manually confirmed on Android and the iOS simulator.
 
-## Phase 5 — CI/CD and regression
+## Phase 5 — Application CI/CD
 
-- Add PR, main, nightly, and release workflows.
-- Add Allure reporting and artifacts.
-- Add Android/iOS execution.
-- Add optional BrowserStack integration.
-- Add k6 performance smoke test.
+- Add pull request, main, and release workflows.
 - Add release build and deployment steps.
 
-**Exit criteria:** Pipeline executes the correct suites by trigger and publishes useful diagnostics.
+**Exit criteria:** Pipelines run internal tests, quality checks, and builds by trigger, and produce release artifacts.
 
 ## Phase 6 — Portfolio
 
 - Architecture diagram and decision records.
-- Requirements-to-test traceability matrix.
-- Test strategy and execution evidence.
-- CI/CD walkthrough.
-- AI-assisted development and test-maintenance demonstration.
-- Short screen-recorded demo and public README.
+- Public README.
+
+The traceability matrix, execution evidence, CI/CD walkthrough, AI-assisted test maintenance demonstration, and demo recording belong to the TaskFlow Automation repository.
 
 ## Optional enhancement — PostgreSQL and Docker
 

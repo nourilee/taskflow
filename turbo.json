@@ -19,10 +19,6 @@
       "dependsOn": ["^build", "db:generate"],
       "cache": false
     },
-    "test:api": {
-      "dependsOn": ["^build"],
-      "cache": false
-    },
     "dev": {
       "dependsOn": ["^build", "db:generate"],
       "cache": false,

@@ -41,7 +41,7 @@
 **Consequences:**
 
 - Prisma's `mode: "insensitive"` is unavailable on SQLite, so case-insensitive title search needs another approach and a test covering non-ASCII titles.
-- SQLite allows one writer at a time, which affects concurrent-update tests and limits what k6 write results show.
+- SQLite allows one writer at a time, which affects concurrent-update tests and limits what write-load results show.
 - A deployed API needs a persistent disk and cannot run as multiple instances.
 
 ## ADR-007: Task rules and API conventions
@@ -56,3 +56,15 @@
 - A user far from `APP_TIMEZONE` can have a date rejected near midnight.
 - Changing how titles are encoded requires rewriting `titleNormalized` for existing rows.
 - Status changes check then write, so two racing requests can both succeed. The final state is still valid.
+
+## ADR-008: Separate application and automation repositories
+
+**Decision:** This repository holds the application, unit tests, integration tests, and application CI/CD. A separate TaskFlow Automation repository holds PactumJS, Playwright, Appium + WebdriverIO + Mocha, k6, Allure, cross-browser/device testing, regression suites, and its own CI/CD. This decision is permanent unless the owner explicitly approves a change.
+
+**Reason:** The automation repository validates TaskFlow independently, as an external consumer, through its public API and user interfaces. Keeping it separate proves that independence and keeps this repository focused on the product.
+
+**Consequences:**
+
+- The PactumJS suite built in Phase 2 was removed from this repository (it remains in git history at `9cc71b3`), and its full-stack and concurrency coverage moved to Supertest integration tests.
+- Reset and seed stay as scripts, not HTTP routes. The automation pipeline checks out this repository and runs the documented commands. This is the one permitted exception to API/UI-only access, and only for test setup.
+- `/api/v1/health` serves as both the health and readiness check.

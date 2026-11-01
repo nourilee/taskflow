@@ -2,20 +2,35 @@
 
 ## Objectives
 
-Prove correctness at the cheapest effective layer, then validate representative end-to-end journeys on each client.
+Prove correctness at the cheapest effective layer inside this repository, then validate representative end-to-end journeys externally on each client.
 
-## Layers and tools
+## Two testing scopes
 
-| Layer       | Tool                           | Scope                                           |
-| ----------- | ------------------------------ | ----------------------------------------------- |
-| Unit        | Vitest                         | Pure business rules, schemas, date calculations |
-| Component   | Vitest + React Testing Library | Form, cards, filters, loading/error states      |
-| API         | PactumJS                       | HTTP contract and behavior                      |
-| Integration | Vitest + test SQLite database  | Service/repository/database behavior            |
-| Web E2E     | Playwright                     | Browser user journeys                           |
-| Android E2E | Appium + WebdriverIO + Mocha   | Native Android user journeys                    |
-| iOS E2E     | Appium + WebdriverIO + Mocha   | Native iOS user journeys                        |
-| Performance | k6                             | API load and response behavior                  |
+The TaskFlow Automation repository independently validates TaskFlow as an external consumer. It does not import application code or rely on internal tests, and it uses only the public API, the user interfaces, and the documented test data setup commands. Passing internal tests never replaces external validation, and external tests never replace internal ones.
+
+### Internal testing (this repository)
+
+| Layer       | Tool                           | Scope                                                  |
+| ----------- | ------------------------------ | ------------------------------------------------------ |
+| Unit        | Vitest                         | Pure business rules, schemas, date calculations        |
+| Unit (UI)   | Vitest + React Testing Library | Form, cards, filters, loading/error states             |
+| Integration | Vitest + Supertest             | Routes, services, and repositories against test SQLite |
+
+Supertest route integration tests run inside this repository and call the app directly. They are not external API automation.
+
+Mobile component tests may use `jest-expo` if Phase 4 confirms Vitest is unsuitable.
+
+### External automation (TaskFlow Automation repository)
+
+| Layer       | Tool                         | Scope                          |
+| ----------- | ---------------------------- | ------------------------------ |
+| API         | PactumJS                     | HTTP contract and behavior     |
+| Web E2E     | Playwright                   | Browser user journeys          |
+| Android E2E | Appium + WebdriverIO + Mocha | Native Android user journeys   |
+| iOS E2E     | Appium + WebdriverIO + Mocha | Native iOS user journeys       |
+| Performance | k6                           | API load and response behavior |
+
+None of these tools, or their suites, belong in this repository.
 
 ## Core business test matrix
 
@@ -28,7 +43,7 @@ Prove correctness at the cheapest effective layer, then validate representative 
 - Prevent double-submit in UI.
 - Overdue calculation excludes completed tasks.
 
-## Critical end-to-end journeys
+## Critical end-to-end journeys (external)
 
 1. Create task and verify it in dashboard and API.
 2. Edit task title/priority and verify persistence.
@@ -63,18 +78,11 @@ React Native:
 
 ## Test reporting
 
-Publish:
-
-- Allure report
-- JUnit results where useful
-- screenshots on UI failure
-- Appium server/device logs
-- Playwright traces and screenshots
-- API request/response diagnostics with sensitive data redacted
+This repository reports through CI logs and test output. The external repository owns Allure reports, Playwright traces, Appium logs, and other automation artifacts.
 
 ## Quality principles
 
 - Do not use fixed sleeps when condition-based waits are available.
 - Do not retry assertions to mask flaky behavior.
 - Keep assertions meaningful and independent.
-- Validate business rules at unit/API level and representative user journeys at E2E level.
+- Validate business rules in internal tests and representative user journeys externally.

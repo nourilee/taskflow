@@ -1,23 +1,15 @@
-# Claude Code Prompt — Phase 5: Automation and CI/CD
+# Claude Code Prompt — Phase 5: Application CI/CD
 
-Read `AGENTS.md`, test strategy, and CI/CD strategy.
+Read `AGENTS.md` and `docs/CI_CD_STRATEGY.md`.
 
-Implement automation suites and GitHub Actions incrementally:
-
-- Vitest unit/component/integration suites.
-- PactumJS API suite.
-- Playwright web E2E.
-- Appium + WebdriverIO + Mocha mobile E2E.
-- k6 API performance smoke test.
-- Allure reporting and failure artifacts.
+Implement this repository's GitHub Actions workflows incrementally. They run only unit tests, integration tests, code quality checks, type checks, and application builds.
 
 Pipeline triggers:
 
-- PR: lint, typecheck, unit/component, API smoke, web smoke.
-- Main: API and web regression.
-- Nightly: web, Android, iOS regression and performance smoke.
+- PR: format check, lint, typecheck, unit tests, integration tests, builds.
+- Main: the same checks.
 - Release: quality gates and platform builds.
 
-Use isolated test data and avoid shared mutable records in parallel tests. Use condition-based waits rather than fixed sleeps. Never weaken assertions to make a pipeline green. Keep secrets in GitHub Actions secrets.
+External automation belongs to the TaskFlow Automation repository. Do not add it here. Never weaken assertions to make a pipeline green. Keep secrets in GitHub Actions secrets.
 
 Present a plan before editing. Run what is feasible locally and clearly distinguish locally verified behavior from CI-only configuration.

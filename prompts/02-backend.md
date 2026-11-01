@@ -4,7 +4,7 @@ Read `AGENTS.md` and the relevant requirements, architecture, API, and test stra
 
 Add the database environment variables to `.env.example`, which Phase 1 deliberately left out. Implement the Task domain, Prisma/SQLite persistence (see ADR-006), migrations, deterministic seed data, REST CRUD/status endpoints, Zod validation, consistent errors, and OpenAPI/Swagger.
 
-Add unit tests for pure business rules, integration tests against a dedicated test database, and PactumJS API tests.
+Add unit tests for pure business rules, integration tests against a dedicated test database, and Supertest route integration tests.
 
 Important:
 

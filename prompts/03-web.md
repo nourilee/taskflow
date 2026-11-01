@@ -12,6 +12,6 @@ Connect to the real TaskFlow API using the shared typed API client. Implement se
 
 Add React Router routes for `/` and `/tasks/:taskId`, plus a route for create/edit as appropriate without adding a fourth product screen.
 
-Use accessible semantic controls and stable `data-testid` values where useful. Add component tests and Playwright tests for critical user journeys.
+Use accessible semantic controls and stable `data-testid` values where useful. Add component tests.
 
-Do not mock the backend in the primary end-to-end tests. Use the isolated test environment and deterministic seed/reset process. Present a plan first, then implement and validate.
+Do not add Playwright or other external automation; see the testing boundaries in `AGENTS.md`. Confirm the main user journeys manually against the real API. Present a plan first, then implement and validate.
