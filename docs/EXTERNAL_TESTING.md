@@ -93,6 +93,19 @@ Prefer role and label locators. These `data-testid` values are a stable contract
 | Delete dialog    | `confirm-dialog`, `confirm-delete`, `cancel-delete`                                                                                                                                                                  |
 | Create/Edit form | `task-form`, `field-{title,description,priority,status,dueDate}`, `field-{name}-error`, `form-error`, `save-task`, `cancel-form`                                                                                     |
 
-## Current limits
+## Mobile test identifiers
 
-The mobile task screens arrive in Phase 4, so only placeholder identifiers exist there today.
+Build and run steps are in `apps/mobile/README.md`. The package and bundle ID is `dev.taskflow.app`, a placeholder. React Native `testID` values appear as `resource-id` on Android and accessibility identifiers on iOS.
+
+Mobile uses the web identifiers above where the element is the same, with these differences:
+
+| Area      | Mobile values                                                                                                           |
+| --------- | ----------------------------------------------------------------------------------------------------------------------- |
+| Dashboard | `load-more`, `load-more-error` replace `previous-page`, `next-page`, and `page-indicator`                               |
+| Sort      | `task-sort` is a toggle button labelled Soonest first or Latest first                                                   |
+| Details   | Delete confirmation is a native alert with buttons Keep task and Delete task, so it has no `testID`                     |
+| Form      | `field-priority-{LOW,MEDIUM,HIGH}`, `field-status-{PENDING,IN_PROGRESS,COMPLETED}`, `clear-due-date`, `due-date-picker` |
+
+Android may display alert button text in capitals. The Android emulator reaches a host API at `10.0.2.2`.
+
+Deep links: `taskflow://tasks/{taskId}`. See `docs/DEEP_LINK_SPECIFICATION.md`, including the iOS simulator prompt.

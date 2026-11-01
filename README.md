@@ -36,7 +36,7 @@ See `docs/TEST_STRATEGY.md` for the boundary and `docs/EXTERNAL_TESTING.md` for 
 
 ## Repository status
 
-Phases 1 to 3 are in place: a monorepo with the task REST API on SQLite, the web client, and a placeholder mobile app. Mobile screens start in Phase 4. Build incrementally and keep each phase runnable.
+Phases 1 to 4 are in place: a monorepo with the task REST API on SQLite, the web client, and the Expo mobile client. See `apps/mobile/README.md` for native builds. Build incrementally and keep each phase runnable.
 
 ## Getting started
 

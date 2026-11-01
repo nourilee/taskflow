@@ -63,7 +63,7 @@ In this repository:
 
 Design for external testability instead: documented API contracts, predictable status codes and errors, stable `data-testid`/`testID` values, accessibility labels, deterministic seed/reset, isolated environments, and configurable base URLs. See `docs/EXTERNAL_TESTING.md`.
 
-Component tests count as unit tests. Use Vitest for pure logic. `jest-expo` is allowed for mobile component tests if Phase 4 confirms it is needed.
+Component tests count as unit tests. Use Vitest for pure logic. Mobile component tests use `jest-expo`.
 
 ## Engineering rules
 

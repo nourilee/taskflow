@@ -3,11 +3,13 @@ import {
   healthResponseSchema,
   taskListResponseSchema,
   taskSchema,
+  toTaskFieldErrors,
   type ApiErrorBody,
   type CreateTaskInput,
   type HealthResponse,
   type ListTasksQuery,
   type Task,
+  type TaskFieldErrors,
   type TaskListResponse,
   type TaskStatus,
   type UpdateTaskInput,
@@ -40,6 +42,24 @@ export class ApiClientError extends Error {
     this.details = options.details ?? [];
     this.requestId = options.requestId;
   }
+}
+
+export function isNotFound(error: unknown): boolean {
+  return error instanceof ApiClientError && error.status === 404;
+}
+
+export function taskFieldErrors(error: unknown): TaskFieldErrors {
+  return error instanceof ApiClientError ? toTaskFieldErrors(error.details) : {};
+}
+
+export function errorMessage(error: unknown): string {
+  if (error instanceof ApiClientError && error.kind === 'http' && error.code) {
+    return error.message;
+  }
+  if (error instanceof ApiClientError && error.kind === 'network') {
+    return 'TaskFlow could not reach the server. Check that it is running, then try again.';
+  }
+  return 'TaskFlow received an unexpected response. Try again.';
 }
 
 export interface ApiClientOptions {

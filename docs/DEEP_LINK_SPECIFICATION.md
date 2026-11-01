@@ -36,6 +36,14 @@ The HTTPS host is a placeholder until a domain controlled by the project owner i
 - HTTPS association verified on actual device.
 - Fallback behavior when app is not installed.
 
+## Implementation status
+
+- **Web:** `/tasks/{taskId}` is implemented. Unknown paths redirect to the dashboard.
+- **Mobile custom scheme:** `taskflow://tasks/{taskId}` is implemented through Expo Router. Unknown tasks show not-found, and malformed links fall back to the dashboard.
+- **HTTPS App Links and Universal Links:** not configured, because no domain is owned yet.
+
+On the iOS simulator, `xcrun simctl openurl` shows an `Open in "TaskFlow"?` prompt for this custom scheme, even when the app is in the foreground. Tap Open to continue, or allow for that step in automation.
+
 ## Important setup note
 
 Universal Links and verified Android App Links require a real HTTPS domain, correct hosting, and platform association files. A custom scheme can be tested locally without owning a domain, but it is not a substitute for verified HTTPS links.

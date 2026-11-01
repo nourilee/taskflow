@@ -1,12 +1,14 @@
-import { ApiClientError } from '@taskflow/api-client';
+import { errorMessage, isNotFound, taskFieldErrors } from '@taskflow/api-client';
 import {
-  createTaskSchema,
-  isDueDateAllowed,
   nextStatuses,
+  PRIORITY_LABELS,
+  STATUS_LABELS,
   TASK_PRIORITIES,
   TASK_STATUSES,
-  updateTaskSchema,
+  validateTaskForm,
   type Task,
+  type TaskField,
+  type TaskFieldErrors,
   type TaskPriority,
   type TaskStatus,
 } from '@taskflow/shared';
@@ -14,24 +16,7 @@ import { useCallback, useRef, useState, type FormEvent } from 'react';
 import { Link, useNavigate, useParams } from 'react-router';
 import { LoadError, Loading, TaskNotFound } from '../components/states';
 import { useServices } from '../lib/app-context';
-import { errorMessage, isNotFound, PRIORITY_LABELS, STATUS_LABELS } from '../lib/format';
 import { useLoad } from '../lib/use-load';
-
-const FIELDS = ['title', 'description', 'priority', 'dueDate', 'status'] as const;
-type Field = (typeof FIELDS)[number];
-type FieldErrors = Partial<Record<Field, string>>;
-
-const isField = (field: unknown): field is Field => FIELDS.includes(field as Field);
-
-function toFieldErrors(entries: { field: unknown; message: string }[]): FieldErrors {
-  const errors: FieldErrors = {};
-  for (const { field, message } of entries) {
-    if (isField(field) && !errors[field]) {
-      errors[field] = message;
-    }
-  }
-  return errors;
-}
 
 function Form({ task }: { task?: Task }) {
   const { api, today } = useServices();
@@ -41,7 +26,7 @@ function Form({ task }: { task?: Task }) {
   const [priority, setPriority] = useState<TaskPriority>(task?.priority ?? 'MEDIUM');
   const [status, setStatus] = useState<TaskStatus>(task?.status ?? 'PENDING');
   const [dueDate, setDueDate] = useState(task?.dueDate ?? '');
-  const [errors, setErrors] = useState<FieldErrors>({});
+  const [errors, setErrors] = useState<TaskFieldErrors>({});
   const [formError, setFormError] = useState<string>();
   const [saving, setSaving] = useState(false);
   const submitting = useRef(false);
@@ -54,25 +39,14 @@ function Form({ task }: { task?: Task }) {
       return;
     }
 
-    const input = {
-      title,
-      description: description || null,
-      priority,
-      status,
-      dueDate: dueDate || null,
-    };
-    const parsed = (task ? updateTaskSchema : createTaskSchema).safeParse(input);
-    const nextErrors = parsed.success
-      ? {}
-      : toFieldErrors(
-          parsed.error.issues.map((issue) => ({ field: issue.path[0], message: issue.message })),
-        );
-    if (!nextErrors.dueDate && !isDueDateAllowed(dueDate || null, today(), task?.dueDate)) {
-      nextErrors.dueDate = 'Due date cannot be in the past.';
-    }
-    setErrors(nextErrors);
+    const result = validateTaskForm(
+      { title, description, priority, status, dueDate },
+      today(),
+      task,
+    );
+    setErrors(result.valid ? {} : result.errors);
     setFormError(undefined);
-    if (!parsed.success || Object.keys(nextErrors).length > 0) {
+    if (!result.valid) {
       return;
     }
 
@@ -80,11 +54,11 @@ function Form({ task }: { task?: Task }) {
     setSaving(true);
     try {
       const saved = task
-        ? await api.updateTask(task.id, parsed.data)
-        : await api.createTask(parsed.data);
+        ? await api.updateTask(task.id, result.data)
+        : await api.createTask(result.data);
       await navigate(`/tasks/${saved.id}`);
     } catch (failure) {
-      const fieldErrors = failure instanceof ApiClientError ? toFieldErrors(failure.details) : {};
+      const fieldErrors = taskFieldErrors(failure);
       setErrors(fieldErrors);
       if (Object.keys(fieldErrors).length === 0) {
         setFormError(errorMessage(failure));
@@ -94,13 +68,13 @@ function Form({ task }: { task?: Task }) {
     }
   }
 
-  const fieldProps = (field: Field) => ({
+  const fieldProps = (field: TaskField) => ({
     'aria-invalid': errors[field] ? true : undefined,
     'aria-describedby': errors[field] ? `field-${field}-error` : undefined,
     'data-testid': `field-${field}`,
     id: `field-${field}`,
   });
-  const fieldError = (field: Field) =>
+  const fieldError = (field: TaskField) =>
     errors[field] && (
       <span
         className="field-error"

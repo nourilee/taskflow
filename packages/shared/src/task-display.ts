@@ -1,5 +1,4 @@
-import { ApiClientError } from '@taskflow/api-client';
-import type { TaskPriority, TaskStatus } from '@taskflow/shared';
+import type { TaskPriority, TaskStatus } from './task.js';
 
 export const STATUS_LABELS: Record<TaskStatus, string> = {
   PENDING: 'Pending',
@@ -36,18 +35,4 @@ export function formatDate(date: string): string {
     month: 'short',
     day: 'numeric',
   });
-}
-
-export function isNotFound(error: unknown): boolean {
-  return error instanceof ApiClientError && error.status === 404;
-}
-
-export function errorMessage(error: unknown): string {
-  if (error instanceof ApiClientError && error.kind === 'http' && error.code) {
-    return error.message;
-  }
-  if (error instanceof ApiClientError && error.kind === 'network') {
-    return 'TaskFlow could not reach the server. Check that it is running, then try again.';
-  }
-  return 'TaskFlow received an unexpected response. Try again.';
 }

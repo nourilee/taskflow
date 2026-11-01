@@ -3,6 +3,8 @@ packages:
   - packages/*
 
 allowBuilds:
+  '@parcel/watcher': false
+  unrs-resolver: false
   '@scarf/scarf': false
   '@prisma/engines': true
   better-sqlite3: true

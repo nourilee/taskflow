@@ -6,21 +6,23 @@ A TypeScript monorepo with separate web and native mobile clients, a shared API,
 
 ## Stack
 
-| Area               | Decision                           |
-| ------------------ | ---------------------------------- |
-| Workspace          | pnpm workspaces                    |
-| Task orchestration | Turborepo                          |
-| Web                | React + Vite + TypeScript          |
-| Mobile             | React Native + Expo + TypeScript   |
-| API                | Node.js + Express + TypeScript     |
-| Database           | SQLite (from Phase 2; see ADR-006) |
-| ORM                | Prisma                             |
-| Validation         | Zod                                |
-| API documentation  | OpenAPI / Swagger UI               |
-| Unit tests         | Vitest                             |
-| Component tests    | React Testing Library              |
-| Integration tests  | Vitest + Supertest                 |
-| CI/CD              | GitHub Actions                     |
+| Area               | Decision                                 |
+| ------------------ | ---------------------------------------- |
+| Workspace          | pnpm workspaces                          |
+| Task orchestration | Turborepo                                |
+| Web                | React + Vite + TypeScript                |
+| Mobile             | React Native + Expo + TypeScript         |
+| API                | Node.js + Express + TypeScript           |
+| Database           | SQLite (from Phase 2; see ADR-006)       |
+| ORM                | Prisma                                   |
+| Validation         | Zod                                      |
+| API documentation  | OpenAPI / Swagger UI                     |
+| Unit tests         | Vitest                                   |
+| Component tests    | React Testing Library                    |
+| Integration tests  | Vitest + Supertest                       |
+| Mobile navigation  | Expo Router                              |
+| Mobile unit tests  | jest-expo + React Native Testing Library |
+| CI/CD              | GitHub Actions                           |
 
 ## Repository layout
 

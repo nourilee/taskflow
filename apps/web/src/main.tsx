@@ -1,10 +1,10 @@
 import { createApiClient } from '@taskflow/api-client';
+import { localToday } from '@taskflow/shared';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter } from 'react-router';
 import { App } from './App';
 import { AppProvider } from './lib/app-context';
-import { localToday } from './lib/format';
 import './styles.css';
 
 const root = document.getElementById('root');

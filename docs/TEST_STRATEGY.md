@@ -18,7 +18,7 @@ The TaskFlow Automation repository independently validates TaskFlow as an extern
 
 Supertest route integration tests run inside this repository and call the app directly. They are not external API automation.
 
-Mobile component tests may use `jest-expo` if Phase 4 confirms Vitest is unsuitable.
+Mobile component tests use `jest-expo` and React Native Testing Library, because Vitest does not run React Native components reliably. Pure logic stays in the shared packages under Vitest.
 
 ### External automation (TaskFlow Automation repository)
 

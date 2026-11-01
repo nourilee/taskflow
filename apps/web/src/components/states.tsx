@@ -1,6 +1,6 @@
+import { errorMessage } from '@taskflow/api-client';
 import type { ReactNode } from 'react';
 import { Link } from 'react-router';
-import { errorMessage } from '../lib/format';
 
 export function Loading({ label }: { label: string }) {
   return (

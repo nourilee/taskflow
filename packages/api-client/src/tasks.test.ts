@@ -1,6 +1,13 @@
 import type { Task } from '@taskflow/shared';
 import { describe, expect, it, vi } from 'vitest';
-import { ApiClientError, createApiClient, type ApiClient } from './index.js';
+import {
+  ApiClientError,
+  createApiClient,
+  errorMessage,
+  isNotFound,
+  taskFieldErrors,
+  type ApiClient,
+} from './index.js';
 
 const baseUrl = 'http://api.test/api/v1';
 const task: Task = {
@@ -174,5 +181,31 @@ describe('task request failures', () => {
     const error = await captureError(call(client));
 
     expect(error).toMatchObject({ kind: 'invalid_response', status: 200 });
+  });
+});
+
+describe('error helpers', () => {
+  it('recognises a 404', () => {
+    expect(isNotFound(new ApiClientError('http', 'Missing', { status: 404 }))).toBe(true);
+    expect(isNotFound(new ApiClientError('http', 'Failed', { status: 500 }))).toBe(false);
+    expect(isNotFound(new Error('other'))).toBe(false);
+  });
+
+  it('maps API details to task fields', () => {
+    const error = new ApiClientError('http', 'Invalid', {
+      details: [{ field: 'title', message: 'Too short.' }],
+    });
+
+    expect(taskFieldErrors(error)).toEqual({ title: 'Too short.' });
+    expect(taskFieldErrors(new Error('other'))).toEqual({});
+  });
+
+  it.each([
+    [new ApiClientError('http', 'Task not found.', { code: 'NOT_FOUND' }), 'Task not found.'],
+    [new ApiClientError('network', 'x'), 'could not reach the server'],
+    [new ApiClientError('http', 'Bad gateway'), 'unexpected response'],
+    [new Error('other'), 'unexpected response'],
+  ])('describes %s', (error, expected) => {
+    expect(errorMessage(error)).toContain(expected);
   });
 });

@@ -68,3 +68,14 @@
 - The PactumJS suite built in Phase 2 was removed from this repository (it remains in git history at `9cc71b3`), and its full-stack and concurrency coverage moved to Supertest integration tests.
 - Reset and seed stay as scripts, not HTTP routes. The automation pipeline checks out this repository and runs the documented commands. This is the one permitted exception to API/UI-only access, and only for test setup.
 - `/api/v1/health` serves as both the health and readiness check.
+
+## ADR-009: Mobile navigation and tests
+
+**Decision:** Use Expo Router for mobile navigation and `jest-expo` with React Native Testing Library for mobile component tests. After a save, both clients open Task Details. Dashboard filters live in the URL on web and in screen state on mobile, which uses Load more instead of Previous and Next.
+
+**Reason:** Expo Router's file routes match the deep link specification and are pinned by Expo SDK 58. Vitest does not run React Native components reliably.
+
+**Consequences:**
+
+- Route files are not covered by component tests, because `expo-router` is mocked. Deep links are confirmed on devices.
+- Native folders are generated, so `app.json` is the source of truth for native configuration.
