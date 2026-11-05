@@ -3,18 +3,32 @@ import {
   formatDate,
   isOverdue,
   nextStatuses,
-  PRIORITY_LABELS,
   STATUS_ACTIONS,
-  STATUS_LABELS,
   statusSlug,
   type TaskStatus,
 } from '@taskflow/shared';
+import {
+  ArrowLeft,
+  CircleCheck,
+  Pencil,
+  Play,
+  RotateCcw,
+  Trash2,
+  type LucideIcon,
+} from 'lucide-react';
 import { useCallback, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router';
+import { OverdueBadge, PriorityIndicator, StatusBadge } from '../components/badges';
 import { ConfirmDialog } from '../components/ConfirmDialog';
 import { LoadError, Loading, TaskNotFound } from '../components/states';
 import { useServices } from '../lib/app-context';
 import { useLoad } from '../lib/use-load';
+
+const ACTION_ICONS: Record<TaskStatus, LucideIcon> = {
+  PENDING: RotateCcw,
+  IN_PROGRESS: Play,
+  COMPLETED: CircleCheck,
+};
 
 export function TaskDetails() {
   const { taskId = '' } = useParams();
@@ -65,25 +79,28 @@ export function TaskDetails() {
   }
 
   return (
-    <article className={`details tone-${statusSlug(task.status)}`}>
+    <article className="details">
       <Link className="back" to="/" data-testid="back-to-dashboard">
+        <ArrowLeft aria-hidden size={16} />
         Back to dashboard
       </Link>
-      <h1 data-testid="task-title">{task.title}</h1>
-      {isOverdue(task, today()) && (
-        <p className="overdue" data-testid={`task-overdue-${task.id}`}>
-          Overdue
-        </p>
-      )}
+      <div className="details-head">
+        <h1 data-testid="task-title">{task.title}</h1>
+        {isOverdue(task, today()) && <OverdueBadge testId={`task-overdue-${task.id}`} />}
+      </div>
 
       <dl className="fields">
         <div>
           <dt>Status</dt>
-          <dd data-testid="task-status">{STATUS_LABELS[task.status]}</dd>
+          <dd>
+            <StatusBadge status={task.status} testId="task-status" />
+          </dd>
         </div>
         <div>
           <dt>Priority</dt>
-          <dd data-testid="task-priority">{PRIORITY_LABELS[task.priority]}</dd>
+          <dd>
+            <PriorityIndicator priority={task.priority} testId="task-priority" />
+          </dd>
         </div>
         <div>
           <dt>Due date</dt>
@@ -112,19 +129,24 @@ export function TaskDetails() {
       )}
 
       <div className="actions">
-        {nextStatuses(task.status).map((status) => (
-          <button
-            key={status}
-            type="button"
-            className="button"
-            disabled={busy}
-            onClick={() => void changeStatus(status)}
-            data-testid={`status-action-${statusSlug(status)}`}
-          >
-            {STATUS_ACTIONS[status]}
-          </button>
-        ))}
+        {nextStatuses(task.status).map((status) => {
+          const Icon = ACTION_ICONS[status];
+          return (
+            <button
+              key={status}
+              type="button"
+              className="button"
+              disabled={busy}
+              onClick={() => void changeStatus(status)}
+              data-testid={`status-action-${statusSlug(status)}`}
+            >
+              <Icon aria-hidden size={18} />
+              {STATUS_ACTIONS[status]}
+            </button>
+          );
+        })}
         <Link className="button button-quiet" to={`/tasks/${task.id}/edit`} data-testid="edit-task">
+          <Pencil aria-hidden size={18} />
           Edit task
         </Link>
         <button
@@ -134,6 +156,7 @@ export function TaskDetails() {
           onClick={() => setConfirming(true)}
           data-testid="delete-task"
         >
+          <Trash2 aria-hidden size={18} />
           Delete task
         </button>
       </div>

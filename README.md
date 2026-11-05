@@ -12,6 +12,8 @@ Three primary screens:
 
 Users can create, view, update, complete, reopen, and delete tasks without signing in.
 
+Web and mobile share one brand and offer Light, Dark, and System themes. See `docs/DESIGN_SYSTEM.md`.
+
 ## Two-repository testing approach
 
 | Repository                     | Responsibility                                                                                                                           |
@@ -39,14 +41,16 @@ Checks: `pnpm format:check`, `pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm t
 
 ## Documentation
 
-| Topic                                  | Source                                                |
-| -------------------------------------- | ----------------------------------------------------- |
-| Rules for contributors and AI agents   | `AGENTS.md`                                           |
-| Product requirements                   | `docs/REQUIREMENTS.md`, `docs/PROJECT_OVERVIEW.md`    |
-| Architecture and technology stack      | `docs/TECHNICAL_ARCHITECTURE.md`, `docs/DECISIONS.md` |
-| REST API contract                      | `docs/API_SPECIFICATION.md`                           |
-| Deep links                             | `docs/DEEP_LINK_SPECIFICATION.md`                     |
-| Testing and CI/CD                      | `docs/TEST_STRATEGY.md`, `docs/CI_CD_STRATEGY.md`     |
-| Seed data, reset, and test identifiers | `docs/EXTERNAL_TESTING.md`                            |
-| Phase plan                             | `docs/IMPLEMENTATION_ROADMAP.md`                      |
-| Native mobile builds                   | `apps/mobile/README.md`                               |
+| Topic                                | Source                                                |
+| ------------------------------------ | ----------------------------------------------------- |
+| Rules for contributors and AI agents | `AGENTS.md`                                           |
+| Product requirements                 | `docs/REQUIREMENTS.md`, `docs/PROJECT_OVERVIEW.md`    |
+| Architecture and technology stack    | `docs/TECHNICAL_ARCHITECTURE.md`, `docs/DECISIONS.md` |
+| REST API contract                    | `docs/API_SPECIFICATION.md`                           |
+| Deep links                           | `docs/DEEP_LINK_SPECIFICATION.md`                     |
+| Testing and CI/CD                    | `docs/TEST_STRATEGY.md`, `docs/CI_CD_STRATEGY.md`     |
+| Seed data and reset                  | `docs/EXTERNAL_TESTING.md`                            |
+| Test identifiers                     | `docs/UI_COMPONENT_LOCATOR_INVENTORY.md`              |
+| Brand, themes, and components        | `docs/DESIGN_SYSTEM.md`                               |
+| Phase plan                           | `docs/IMPLEMENTATION_ROADMAP.md`                      |
+| Native mobile builds                 | `apps/mobile/README.md`                               |

@@ -15,22 +15,25 @@ import {
   type TaskStatus,
 } from '@taskflow/shared';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import { radius, spacing, touchTarget, fontSize } from '@taskflow/design-tokens';
 import { router, useLocalSearchParams } from 'expo-router';
+import { Calendar, CircleAlert, type LucideIcon } from 'lucide-react-native';
 import { useCallback, useRef, useState } from 'react';
 import {
   KeyboardAvoidingView,
   Platform,
   Pressable,
   ScrollView,
-  StyleSheet,
   Text,
   TextInput,
   View,
 } from 'react-native';
+import { PRIORITY_ICONS } from '../components/badges';
 import { Button } from '../components/Button';
 import { LoadError, Loading, TaskNotFound } from '../components/states';
 import { useServices } from '../lib/app-context';
-import { colors, shared } from '../lib/theme';
+import { fonts, makeStyles, useSharedStyles } from '../lib/theme';
+import { useTheme } from '../lib/theme-context';
 import { useLoad } from '../lib/use-load';
 
 function toDate(value: string): Date {
@@ -39,13 +42,43 @@ function toDate(value: string): Date {
 }
 
 function FieldError({ field, errors }: { field: TaskField; errors: TaskFieldErrors }) {
+  const { colors } = useTheme();
+  const shared = useSharedStyles();
+  const styles = useStyles();
   if (!errors[field]) {
     return null;
   }
   return (
-    <Text style={shared.error} testID={`field-${field}-error`} accessibilityLiveRegion="polite">
-      {errors[field]}
-    </Text>
+    <View style={styles.errorRow}>
+      <CircleAlert size={16} color={colors.danger} />
+      <Text
+        style={[shared.error, styles.errorText]}
+        testID={`field-${field}-error`}
+        accessibilityLiveRegion="polite"
+      >
+        {errors[field]}
+      </Text>
+    </View>
+  );
+}
+
+// The marker is hidden from screen readers, so each field keeps its plain name.
+function FieldLabel({ label, marker }: { label: string; marker?: string }) {
+  const shared = useSharedStyles();
+  const styles = useStyles();
+  return (
+    <View style={styles.labelRow}>
+      <Text style={shared.label}>{label}</Text>
+      {marker && (
+        <Text
+          style={shared.muted}
+          accessibilityElementsHidden
+          importantForAccessibility="no-hide-descendants"
+        >
+          {marker}
+        </Text>
+      )}
+    </View>
   );
 }
 
@@ -55,6 +88,7 @@ function Choice<T extends string>({
   value,
   options,
   labels,
+  icons,
   onChange,
 }: {
   label: string;
@@ -62,14 +96,19 @@ function Choice<T extends string>({
   value: T;
   options: readonly T[];
   labels: Record<T, string>;
+  icons?: Record<T, LucideIcon>;
   onChange(value: T): void;
 }) {
+  const { colors } = useTheme();
+  const shared = useSharedStyles();
+  const styles = useStyles();
   return (
     <View style={styles.field}>
       <Text style={shared.label}>{label}</Text>
       <View style={styles.choices} accessibilityRole="radiogroup" accessibilityLabel={label}>
         {options.map((option) => {
           const selected = option === value;
+          const Icon: LucideIcon | undefined = icons?.[option];
           return (
             <Pressable
               key={option}
@@ -80,6 +119,7 @@ function Choice<T extends string>({
               onPress={() => onChange(option)}
               style={[styles.choice, selected && styles.choiceSelected]}
             >
+              {Icon && <Icon size={16} color={selected ? colors.primaryText : colors.text} />}
               <Text style={[styles.choiceText, selected && styles.choiceTextSelected]}>
                 {labels[option]}
               </Text>
@@ -93,6 +133,9 @@ function Choice<T extends string>({
 
 function Form({ task }: { task?: Task }) {
   const { api, today } = useServices();
+  const { colors, theme } = useTheme();
+  const shared = useSharedStyles();
+  const styles = useStyles();
   const [title, setTitle] = useState(task?.title ?? '');
   const [description, setDescription] = useState(task?.description ?? '');
   const [priority, setPriority] = useState<TaskPriority>(task?.priority ?? 'MEDIUM');
@@ -159,10 +202,12 @@ function Form({ task }: { task?: Task }) {
         )}
 
         <View style={styles.field}>
-          <Text style={shared.label}>Title</Text>
+          <FieldLabel label="Title" marker="Required" />
           <TextInput
             testID="field-title"
             accessibilityLabel="Title"
+            placeholder="What needs doing?"
+            placeholderTextColor={colors.textMuted}
             value={title}
             onChangeText={setTitle}
             style={[shared.input, errors.title && styles.invalid]}
@@ -171,11 +216,13 @@ function Form({ task }: { task?: Task }) {
         </View>
 
         <View style={styles.field}>
-          <Text style={shared.label}>Description</Text>
+          <FieldLabel label="Description" marker="Optional" />
           <TextInput
             testID="field-description"
             accessibilityLabel="Description"
             multiline
+            placeholder="Add any details that will help later"
+            placeholderTextColor={colors.textMuted}
             value={description}
             onChangeText={setDescription}
             style={[shared.input, styles.multiline, errors.description && styles.invalid]}
@@ -189,6 +236,7 @@ function Form({ task }: { task?: Task }) {
           value={priority}
           options={TASK_PRIORITIES}
           labels={PRIORITY_LABELS}
+          icons={PRIORITY_ICONS}
           onChange={setPriority}
         />
         <FieldError field="priority" errors={errors} />
@@ -204,7 +252,7 @@ function Form({ task }: { task?: Task }) {
         <FieldError field="status" errors={errors} />
 
         <View style={styles.field}>
-          <Text style={shared.label}>Due date</Text>
+          <FieldLabel label="Due date" marker="Optional" />
           <View style={styles.dateRow}>
             <Pressable
               testID="field-dueDate"
@@ -213,7 +261,10 @@ function Form({ task }: { task?: Task }) {
               onPress={() => setPickingDate(true)}
               style={[shared.input, styles.dateButton, errors.dueDate && styles.invalid]}
             >
-              <Text style={shared.body}>{dueDate ? formatDate(dueDate) : 'Choose a date'}</Text>
+              <Calendar size={18} color={colors.textMuted} />
+              <Text style={dueDate ? shared.body : styles.datePlaceholder}>
+                {dueDate ? formatDate(dueDate) : 'Choose a date'}
+              </Text>
             </Pressable>
             {dueDate !== '' && (
               <Button
@@ -232,6 +283,8 @@ function Form({ task }: { task?: Task }) {
             <DateTimePicker
               testID="due-date-picker"
               mode="date"
+              themeVariant={theme}
+              accentColor={colors.primary}
               display={Platform.OS === 'ios' ? 'inline' : 'default'}
               value={dueDate ? toDate(dueDate) : toDate(today())}
               onValueChange={(_event, date) => {
@@ -247,6 +300,7 @@ function Form({ task }: { task?: Task }) {
           label={saving ? 'Saving' : task ? 'Save changes' : 'Create task'}
           testID="save-task"
           disabled={saving}
+          busy={saving}
           onPress={() => void save()}
         />
         <Button label="Cancel" testID="cancel-form" variant="quiet" onPress={() => router.back()} />
@@ -277,25 +331,37 @@ export function EditTask() {
   return <Form key={task.id} task={task} />;
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((colors) => ({
   screen: { flex: 1 },
-  content: { gap: 16, padding: 16 },
-  field: { gap: 4 },
+  content: { gap: spacing.lg, padding: spacing.lg },
+  field: { gap: spacing.xs },
+  labelRow: { flexDirection: 'row', justifyContent: 'space-between', gap: spacing.sm },
+  errorRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.xs },
+  errorText: { flex: 1 },
   invalid: { borderWidth: 2, borderColor: colors.danger },
   multiline: { minHeight: 96, paddingTop: 10, textAlignVertical: 'top' },
-  choices: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
+  choices: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
   choice: {
-    minHeight: 44,
+    flexGrow: 1,
+    flexDirection: 'row',
+    gap: spacing.xs,
+    minHeight: touchTarget,
     justifyContent: 'center',
-    paddingHorizontal: 14,
+    alignItems: 'center',
+    paddingHorizontal: spacing.md,
     borderWidth: 1,
-    borderColor: colors.inkSoft,
-    borderRadius: 4,
+    borderColor: colors.borderControl,
+    borderRadius: radius.sm,
     backgroundColor: colors.surface,
   },
-  choiceSelected: { backgroundColor: colors.ink, borderColor: colors.ink },
-  choiceText: { color: colors.ink, fontSize: 16 },
-  choiceTextSelected: { color: colors.surface, fontWeight: '600' },
-  dateRow: { flexDirection: 'row', gap: 8 },
-  dateButton: { flex: 1, justifyContent: 'center' },
-});
+  choiceSelected: {
+    borderWidth: 2,
+    backgroundColor: colors.primaryTint,
+    borderColor: colors.primary,
+  },
+  choiceText: { color: colors.text, fontFamily: fonts.regular, fontSize: fontSize.md },
+  choiceTextSelected: { color: colors.primaryText, fontFamily: fonts.bold },
+  dateRow: { flexDirection: 'row', gap: spacing.sm },
+  dateButton: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
+  datePlaceholder: { color: colors.textMuted, fontFamily: fonts.regular, fontSize: fontSize.md },
+}));

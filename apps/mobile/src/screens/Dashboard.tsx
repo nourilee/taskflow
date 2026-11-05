@@ -10,21 +10,18 @@ import {
   type TaskListResponse,
   type TaskStatus,
 } from '@taskflow/shared';
+import { brand, fontSize, lineHeight, radius, spacing, themes } from '@taskflow/design-tokens';
 import { router, useFocusEffect } from 'expo-router';
-import { useCallback, useEffect, useRef, useState } from 'react';
-import {
-  FlatList,
-  Pressable,
-  RefreshControl,
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
-} from 'react-native';
+import { ArrowUpDown, Calendar, ListTodo, Plus, SearchX } from 'lucide-react-native';
+import { useCallback, useContext, useEffect, useRef, useState } from 'react';
+import { FlatList, Pressable, RefreshControl, Text, TextInput, View } from 'react-native';
+import { SafeAreaInsetsContext } from 'react-native-safe-area-context';
+import { OverdueBadge, PriorityIndicator, STATUS_ICONS, StatusBadge } from '../components/badges';
 import { Button } from '../components/Button';
 import { LoadError, Loading } from '../components/states';
 import { useServices } from '../lib/app-context';
-import { colors, shared, statusColors } from '../lib/theme';
+import { cardShadow, fonts, makeStyles, statusColors, useSharedStyles } from '../lib/theme';
+import { useTheme } from '../lib/theme-context';
 import { useLoad } from '../lib/use-load';
 
 const SEARCH_DELAY_MS = 300;
@@ -40,7 +37,7 @@ interface MorePages {
   items: Task[];
 }
 
-function StatusStrip({
+function SummaryCards({
   summary,
   active,
   onSelect,
@@ -49,49 +46,73 @@ function StatusStrip({
   active: TaskStatus | undefined;
   onSelect(status: TaskStatus | undefined): void;
 }) {
+  const { colors } = useTheme();
+  const styles = useStyles();
   const options = [
-    { key: 'all', label: 'All', count: summary.all, status: undefined, color: colors.ink },
+    {
+      key: 'all',
+      label: 'Total tasks',
+      count: summary.all,
+      status: undefined,
+      icon: ListTodo,
+      color: colors.primaryText,
+    },
     ...TASK_STATUSES.map((status) => ({
       key: statusSlug(status),
       label: STATUS_LABELS[status],
       count: summary[SUMMARY_KEYS[status]],
       status,
-      color: statusColors[status],
+      icon: STATUS_ICONS[status],
+      color: statusColors(colors, status).color,
     })),
   ];
 
   return (
-    <View style={styles.strip} accessibilityLabel="Filter by status">
-      {options.map((option) => {
-        const selected = active === option.status;
-        return (
-          <Pressable
-            key={option.key}
-            testID={`status-filter-${option.key}`}
-            accessibilityRole="button"
-            accessibilityLabel={`${option.label}, ${option.count}`}
-            accessibilityState={{ selected }}
-            onPress={() => onSelect(option.status)}
-            style={[
-              styles.segment,
-              { backgroundColor: option.color, flexGrow: Math.max(option.count, 1) },
-              selected && styles.segmentSelected,
-            ]}
-          >
-            <Text testID={`dashboard-summary-${option.key}`} style={styles.count}>
-              {option.count}
-            </Text>
-            <Text style={styles.segmentLabel} numberOfLines={1}>
-              {option.label}
-            </Text>
-          </Pressable>
-        );
-      })}
+    <View style={styles.summary}>
+      <View style={styles.cards} accessibilityLabel="Filter by status">
+        {options.map(({ key, label, count, status, icon: Icon, color }) => {
+          const selected = active === status;
+          return (
+            <Pressable
+              key={key}
+              testID={`status-filter-${key}`}
+              accessibilityRole="button"
+              accessibilityLabel={`${label}, ${count}`}
+              accessibilityState={{ selected }}
+              onPress={() => onSelect(status)}
+              style={[styles.card, selected && styles.cardSelected]}
+            >
+              <Text testID={`dashboard-summary-${key}`} style={styles.count}>
+                {count}
+              </Text>
+              <Icon size={14} color={color} />
+              <Text
+                style={[styles.cardLabel, selected && styles.cardLabelSelected]}
+                numberOfLines={2}
+              >
+                {label}
+              </Text>
+            </Pressable>
+          );
+        })}
+      </View>
+      <View
+        style={styles.flow}
+        accessibilityElementsHidden
+        importantForAccessibility="no-hide-descendants"
+      >
+        <View style={{ flex: summary.pending, backgroundColor: brand.amber }} />
+        <View style={{ flex: summary.inProgress, backgroundColor: brand.blue }} />
+        <View style={{ flex: summary.completed, backgroundColor: brand.teal }} />
+      </View>
     </View>
   );
 }
 
 function TaskRow({ task, today }: { task: Task; today: string }) {
+  const { colors } = useTheme();
+  const styles = useStyles();
+  const shared = useSharedStyles();
   const overdue = isOverdue(task, today);
   const due = task.dueDate ? `Due ${formatDate(task.dueDate)}` : 'No due date';
   const meta = `${STATUS_LABELS[task.status]}. ${PRIORITY_LABELS[task.priority]} priority. ${due}.`;
@@ -101,23 +122,30 @@ function TaskRow({ task, today }: { task: Task; today: string }) {
       accessibilityRole="button"
       accessibilityLabel={`${task.title}. ${meta}${overdue ? ' Overdue.' : ''}`}
       onPress={() => router.push(`/tasks/${task.id}`)}
-      style={[styles.row, { borderLeftColor: statusColors[task.status] }]}
+      style={({ pressed }) => [styles.row, pressed && styles.rowPressed]}
     >
-      <View style={styles.rowBody}>
-        <Text style={styles.title}>{task.title}</Text>
-        <Text style={styles.meta}>{meta}</Text>
+      <Text style={styles.title}>{task.title}</Text>
+      <View style={styles.rowMeta}>
+        <StatusBadge status={task.status} />
+        <PriorityIndicator priority={task.priority} />
       </View>
-      {overdue && (
-        <Text testID={`task-overdue-${task.id}`} style={styles.overdue}>
-          Overdue
-        </Text>
-      )}
+      <View style={styles.rowMeta}>
+        <View style={styles.due}>
+          <Calendar size={14} color={colors.textMuted} />
+          <Text style={shared.muted}>{due}</Text>
+        </View>
+        {overdue && <OverdueBadge testID={`task-overdue-${task.id}`} />}
+      </View>
     </Pressable>
   );
 }
 
 export function Dashboard() {
   const { api, today } = useServices();
+  const { colors } = useTheme();
+  const styles = useStyles();
+  const shared = useSharedStyles();
+  const bottomInset = useContext(SafeAreaInsetsContext)?.bottom ?? 0;
   const [status, setStatus] = useState<TaskStatus>();
   const [input, setInput] = useState('');
   const [search, setSearch] = useState('');
@@ -180,27 +208,23 @@ export function Dashboard() {
 
   return (
     <View style={styles.screen}>
-      <View style={styles.header}>
-        <Button
-          label="Create task"
-          testID="create-task"
-          onPress={() => router.push('/tasks/new')}
-        />
-      </View>
+      <Text style={styles.heading} accessibilityRole="header">
+        Tasks
+      </Text>
 
       {error !== undefined && <LoadError error={error} onRetry={refresh} />}
       {error === undefined && !data && <Loading label="Loading tasks" />}
 
       {error === undefined && data && (
         <>
-          <StatusStrip summary={data.summary} active={status} onSelect={setStatus} />
+          <SummaryCards summary={data.summary} active={status} onSelect={setStatus} />
 
           <View style={styles.controls}>
             <TextInput
               testID="task-search"
               accessibilityLabel="Search titles"
               placeholder="Search titles"
-              placeholderTextColor={colors.inkSoft}
+              placeholderTextColor={colors.textMuted}
               autoCorrect={false}
               returnKeyType="search"
               value={input}
@@ -211,6 +235,7 @@ export function Dashboard() {
               label={order === 'asc' ? 'Soonest first' : 'Latest first'}
               testID="task-sort"
               variant="quiet"
+              icon={ArrowUpDown}
               onPress={() => setOrder(order === 'asc' ? 'desc' : 'asc')}
             />
           </View>
@@ -221,15 +246,25 @@ export function Dashboard() {
             keyExtractor={(task) => task.id}
             keyboardShouldPersistTaps="handled"
             renderItem={({ item }) => <TaskRow task={item} today={today()} />}
-            refreshControl={<RefreshControl refreshing={false} onRefresh={refresh} />}
+            refreshControl={
+              <RefreshControl
+                refreshing={false}
+                onRefresh={refresh}
+                tintColor={colors.primary}
+                colors={[colors.primary]}
+                progressBackgroundColor={colors.surface}
+              />
+            }
             ListEmptyComponent={
               data.summary.all === 0 ? (
                 <View style={shared.notice} testID="empty-state">
+                  <ListTodo size={28} color={colors.primaryText} />
                   <Text style={shared.heading}>No tasks yet</Text>
                   <Text style={shared.body}>Create your first task to get started.</Text>
                 </View>
               ) : loading ? undefined : (
                 <View style={shared.notice} testID="no-results">
+                  <SearchX size={28} color={colors.primaryText} />
                   <Text style={shared.heading}>No matching tasks</Text>
                   <Text style={shared.body}>Change your search or filter to see more tasks.</Text>
                   <Button
@@ -266,40 +301,106 @@ export function Dashboard() {
           />
         </>
       )}
+
+      <Pressable
+        testID="create-task"
+        accessibilityRole="button"
+        accessibilityLabel="Create task"
+        onPress={() => router.push('/tasks/new')}
+        style={({ pressed }) => [
+          styles.create,
+          { bottom: spacing.lg + bottomInset },
+          pressed && styles.createPressed,
+        ]}
+      >
+        <Plus size={20} color={colors.onPrimary} />
+        <Text style={styles.createText}>Create task</Text>
+      </Pressable>
     </View>
   );
 }
 
-const styles = StyleSheet.create({
+// Leaves the last row clear of the floating Create task button.
+const CREATE_BUTTON_CLEARANCE = 88;
+
+const useStyles = makeStyles((colors, theme) => ({
   screen: { flex: 1 },
-  header: { padding: 16, paddingBottom: 12 },
-  strip: { flexDirection: 'row', gap: 2, paddingHorizontal: 16 },
-  segment: {
-    flexBasis: 72,
-    minHeight: 64,
-    padding: 8,
-    borderBottomWidth: 6,
-    borderBottomColor: 'transparent',
+  heading: {
+    paddingHorizontal: spacing.lg,
+    paddingTop: spacing.lg,
+    paddingBottom: spacing.md,
+    color: colors.text,
+    fontFamily: fonts.bold,
+    fontSize: fontSize.xl,
+    lineHeight: lineHeight.xl,
   },
-  segmentSelected: { borderBottomColor: colors.surface },
-  count: { color: colors.surface, fontSize: 24, fontWeight: '700' },
-  segmentLabel: { color: colors.surface, fontSize: 12 },
-  controls: { flexDirection: 'row', gap: 8, padding: 16 },
+  summary: { gap: spacing.sm, paddingHorizontal: spacing.lg },
+  cards: { flexDirection: 'row', gap: spacing.sm },
+  card: {
+    flex: 1,
+    minHeight: 92,
+    gap: 2,
+    alignItems: 'center',
+    paddingHorizontal: spacing.xs,
+    paddingVertical: spacing.sm,
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: radius.md,
+    backgroundColor: colors.surface,
+    ...cardShadow(theme),
+  },
+  cardSelected: { borderWidth: 2, borderColor: colors.primary },
+  count: { color: colors.text, fontFamily: fonts.bold, fontSize: fontSize.lg },
+  cardLabel: {
+    color: colors.textMuted,
+    fontFamily: fonts.medium,
+    fontSize: fontSize.xs,
+    lineHeight: lineHeight.xs,
+    textAlign: 'center',
+  },
+  cardLabelSelected: { color: colors.text, fontFamily: fonts.semibold },
+  flow: {
+    flexDirection: 'row',
+    gap: 3,
+    height: 6,
+    borderRadius: radius.pill,
+    overflow: 'hidden',
+    backgroundColor: colors.border,
+  },
+  controls: { flexDirection: 'row', gap: spacing.sm, padding: spacing.lg },
   search: { flex: 1 },
   row: {
+    gap: spacing.sm,
+    marginHorizontal: spacing.lg,
+    marginBottom: spacing.sm,
+    padding: spacing.md,
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: radius.md,
+    backgroundColor: colors.surface,
+    ...cardShadow(theme),
+  },
+  rowPressed: { backgroundColor: colors.surfaceHover },
+  rowMeta: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: spacing.sm },
+  due: { flexDirection: 'row', alignItems: 'center', gap: spacing.xs },
+  title: { color: colors.text, fontFamily: fonts.semibold, fontSize: fontSize.md },
+  footer: { gap: spacing.sm, padding: spacing.lg, paddingBottom: CREATE_BUTTON_CLEARANCE },
+  create: {
+    position: 'absolute',
+    right: spacing.lg,
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
-    marginHorizontal: 16,
-    padding: 12,
-    borderLeftWidth: 6,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.line,
-    backgroundColor: colors.surface,
+    gap: spacing.sm,
+    minHeight: 52,
+    paddingHorizontal: spacing.lg,
+    borderRadius: radius.pill,
+    backgroundColor: colors.primary,
+    shadowColor: themes.dark.background,
+    shadowOpacity: 0.28,
+    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 6 },
+    elevation: 4,
   },
-  rowBody: { flex: 1 },
-  title: { color: colors.ink, fontSize: 16, fontWeight: '600' },
-  meta: { color: colors.inkSoft, fontSize: 14 },
-  overdue: { color: colors.danger, fontSize: 14, fontWeight: '700' },
-  footer: { gap: 8, padding: 16 },
-});
+  createPressed: { backgroundColor: colors.primaryHover },
+  createText: { color: colors.onPrimary, fontFamily: fonts.semibold, fontSize: fontSize.md },
+}));

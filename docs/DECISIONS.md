@@ -79,3 +79,16 @@
 
 - Route files are not covered by component tests, because `expo-router` is mocked. Deep links are confirmed on devices.
 - Native folders are generated, so `app.json` is the source of truth for native configuration.
+
+## ADR-010: Design tokens and mobile navigation
+
+**Decision:** Design tokens live in `packages/design-tokens`, which generates `tokens.css` for web and exports the same values to mobile. Light, Dark, and System themes are supported, defaulting to System. Mobile keeps its stack navigator, with a floating Create task action and an Appearance sheet instead of bottom tabs.
+
+**Reason:** API code depends on `packages/shared`, so UI values do not belong there. The app has one top-level destination, and tabs would restructure the routes that deep links rely on.
+
+**Consequences:**
+
+- Appearance is a sheet, so the three-screen limit holds.
+- The accent colors are fills only, because they fail text contrast on white. Text uses darker shades from the same hues.
+- Web loads `tokens.css` from the package's build output, so dependent tasks need `^build`.
+- Mobile needs a new native build whenever a native dependency or `app.json` setting changes.

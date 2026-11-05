@@ -74,32 +74,14 @@ pnpm --filter @taskflow/web dev
 
 Routes: `/` (dashboard), `/tasks/new`, `/tasks/{taskId}`, and `/tasks/{taskId}/edit`. Unknown paths redirect to the dashboard. Dashboard filters live in the URL as `status`, `search`, `order`, and `page`.
 
-## Web test identifiers
+## Test identifiers
 
-Prefer role and label locators. These `data-testid` values are a stable contract:
+`docs/UI_COMPONENT_LOCATOR_INVENTORY.md` is the stable contract for `data-testid` and `testID` values on every platform. Prefer role and label locators where available.
 
-| Area             | Values                                                                                                                                                                                                               |
-| ---------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| App              | `app-title`, `loading`, `load-error`, `retry`, `task-not-found`, `back-to-dashboard`                                                                                                                                 |
-| Dashboard        | `create-task`, `task-search`, `task-sort`, `task-list`, `task-card-{id}`, `task-overdue-{id}`, `empty-state`, `no-results`, `clear-filters`, `previous-page`, `next-page`, `page-indicator`                          |
-| Status filters   | `status-filter-{all,pending,in-progress,completed}`, with counts in `dashboard-summary-{all,pending,in-progress,completed}`                                                                                          |
-| Task Details     | `task-title`, `task-status`, `task-priority`, `task-due-date`, `task-description`, `task-created-at`, `task-updated-at`, `status-action-{pending,in-progress,completed}`, `edit-task`, `delete-task`, `action-error` |
-| Delete dialog    | `confirm-dialog`, `confirm-delete`, `cancel-delete`                                                                                                                                                                  |
-| Create/Edit form | `task-form`, `field-{title,description,priority,status,dueDate}`, `field-{name}-error`, `form-error`, `save-task`, `cancel-form`                                                                                     |
+## Run the mobile app
 
-## Mobile test identifiers
+Build and run steps are in `apps/mobile/README.md`. The package and bundle ID is `dev.taskflow.app`, a placeholder.
 
-Build and run steps are in `apps/mobile/README.md`. The package and bundle ID is `dev.taskflow.app`, a placeholder. React Native `testID` values appear as `resource-id` on Android and accessibility identifiers on iOS.
-
-Mobile uses the web identifiers above where the element is the same, with these differences:
-
-| Area      | Mobile values                                                                                                           |
-| --------- | ----------------------------------------------------------------------------------------------------------------------- |
-| Dashboard | `load-more`, `load-more-error` replace `previous-page`, `next-page`, and `page-indicator`                               |
-| Sort      | `task-sort` is a toggle button labelled Soonest first or Latest first                                                   |
-| Details   | Delete confirmation is a native alert with buttons Keep task and Delete task, so it has no `testID`                     |
-| Form      | `field-priority-{LOW,MEDIUM,HIGH}`, `field-status-{PENDING,IN_PROGRESS,COMPLETED}`, `clear-due-date`, `due-date-picker` |
-
-Android may display alert button text in capitals. The Android emulator reaches a host API at `10.0.2.2`.
+The Android emulator reaches a host API at `10.0.2.2`.
 
 Deep links: `taskflow://tasks/{taskId}`. See `docs/DEEP_LINK_SPECIFICATION.md`, including the iOS simulator prompt.

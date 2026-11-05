@@ -1,3 +1,5 @@
+import '@fontsource-variable/inter';
+import '@taskflow/design-tokens/tokens.css';
 import { createApiClient } from '@taskflow/api-client';
 import { localToday } from '@taskflow/shared';
 import { StrictMode } from 'react';

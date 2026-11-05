@@ -5,13 +5,26 @@
     "scheme": "taskflow",
     "version": "0.0.0",
     "orientation": "portrait",
-    "userInterfaceStyle": "light",
+    "userInterfaceStyle": "automatic",
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "dev.taskflow.app"
     },
     "plugins": [
       "expo-router",
+      "expo-font",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/splash-icon.png",
+          "imageWidth": 120,
+          "backgroundColor": "#F7F6FC",
+          "dark": {
+            "image": "./assets/splash-icon.png",
+            "backgroundColor": "#171624"
+          }
+        }
+      ],
       [
         "expo-build-properties",
         {
@@ -19,10 +32,22 @@
             "usesCleartextTraffic": true
           }
         }
+      ],
+      [
+        "./plugins/with-android-accent",
+        {
+          "light": "#7955E8",
+          "dark": "#A58BFF"
+        }
       ]
     ],
     "android": {
-      "package": "dev.taskflow.app"
-    }
+      "package": "dev.taskflow.app",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#7955E8"
+      }
+    },
+    "icon": "./assets/icon.png"
   }
 }

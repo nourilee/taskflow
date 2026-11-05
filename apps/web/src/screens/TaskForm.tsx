@@ -12,11 +12,33 @@ import {
   type TaskPriority,
   type TaskStatus,
 } from '@taskflow/shared';
-import { useCallback, useRef, useState, type FormEvent } from 'react';
+import { CircleAlert } from 'lucide-react';
+import { useCallback, useRef, useState, type FormEvent, type ReactNode } from 'react';
 import { Link, useNavigate, useParams } from 'react-router';
 import { LoadError, Loading, TaskNotFound } from '../components/states';
 import { useServices } from '../lib/app-context';
 import { useLoad } from '../lib/use-load';
+
+// The marker is hidden from assistive tech, so each field keeps its plain name.
+// The title input already announces itself as required.
+function FieldLabel({
+  field,
+  marker,
+  children,
+}: {
+  field: TaskField;
+  marker: string;
+  children: ReactNode;
+}) {
+  return (
+    <label htmlFor={`field-${field}`}>
+      {children}
+      <span className="field-marker" aria-hidden>
+        {marker}
+      </span>
+    </label>
+  );
+}
 
 function Form({ task }: { task?: Task }) {
   const { api, today } = useServices();
@@ -81,6 +103,7 @@ function Form({ task }: { task?: Task }) {
         id={`field-${field}-error`}
         data-testid={`field-${field}-error`}
       >
+        <CircleAlert aria-hidden size={16} />
         {errors[field]}
       </span>
     );
@@ -92,10 +115,10 @@ function Form({ task }: { task?: Task }) {
       noValidate
       data-testid="task-form"
     >
-      <Link className="back" to={task ? `/tasks/${task.id}` : '/'} data-testid="cancel-form">
-        Cancel
-      </Link>
-      <h1>{task ? 'Edit task' : 'Create task'}</h1>
+      <div>
+        <h1>{task ? 'Edit task' : 'Create task'}</h1>
+        <p className="screen-description">Only the title is required.</p>
+      </div>
 
       {formError && (
         <p className="form-error" role="alert" data-testid="form-error">
@@ -104,9 +127,12 @@ function Form({ task }: { task?: Task }) {
       )}
 
       <div className="field">
-        <label htmlFor="field-title">Title</label>
+        <FieldLabel field="title" marker="Required">
+          Title
+        </FieldLabel>
         <input
           {...fieldProps('title')}
+          placeholder="What needs doing?"
           value={title}
           required
           onChange={(event) => setTitle(event.target.value)}
@@ -115,10 +141,13 @@ function Form({ task }: { task?: Task }) {
       </div>
 
       <div className="field">
-        <label htmlFor="field-description">Description</label>
+        <FieldLabel field="description" marker="Optional">
+          Description
+        </FieldLabel>
         <textarea
           {...fieldProps('description')}
           rows={4}
+          placeholder="Add any details that will help later"
           value={description}
           onChange={(event) => setDescription(event.target.value)}
         />
@@ -159,7 +188,9 @@ function Form({ task }: { task?: Task }) {
         </div>
 
         <div className="field">
-          <label htmlFor="field-dueDate">Due date</label>
+          <FieldLabel field="dueDate" marker="Optional">
+            Due date
+          </FieldLabel>
           <input
             {...fieldProps('dueDate')}
             type="date"
@@ -172,8 +203,16 @@ function Form({ task }: { task?: Task }) {
 
       <div className="actions">
         <button type="submit" className="button" disabled={saving} data-testid="save-task">
+          {saving && <span className="spinner spinner-small" aria-hidden />}
           {saving ? 'Saving' : task ? 'Save changes' : 'Create task'}
         </button>
+        <Link
+          className="button button-quiet"
+          to={task ? `/tasks/${task.id}` : '/'}
+          data-testid="cancel-form"
+        >
+          Cancel
+        </Link>
       </div>
     </form>
   );

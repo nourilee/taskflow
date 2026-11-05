@@ -18,6 +18,8 @@ Before making changes, read:
 - `docs/CI_CD_STRATEGY.md`
 - `docs/EXTERNAL_TESTING.md`
 - `docs/IMPLEMENTATION_ROADMAP.md`
+- `docs/DESIGN_SYSTEM.md`
+- `docs/UI_COMPONENT_LOCATOR_INVENTORY.md`
 
 If documents conflict, do not silently choose. Identify the conflict and ask for a decision. Record approved changes in the relevant document.
 
@@ -39,7 +41,7 @@ If documents conflict, do not silently choose. Identify the conflict and ask for
 - Separate React web app and React Native/Expo mobile app.
 - Node.js + Express API.
 - SQLite + Prisma (from Phase 2). PostgreSQL and Docker are a later optional enhancement; see ADR-006.
-- Shared packages for domain types, Zod schemas, business rules, and API client.
+- Shared packages for domain types, Zod schemas, business rules, API client, and design tokens.
 - Keep UI, domain/business rules, API transport, and persistence concerns separated.
 - Prefer simple, explicit abstractions over premature generalization.
 - Do not introduce microservices, authentication, queues, or unnecessary infrastructure.
@@ -80,6 +82,7 @@ Component tests count as unit tests. Use Vitest for pure logic. Mobile component
 
 ## Testability requirements
 
+- Do not rename or remove identifiers in `docs/UI_COMPONENT_LOCATOR_INVENTORY.md` without owner approval. UI changes keep them, and new ones are additive.
 - Web interactive elements expose stable `data-testid` attributes where appropriate.
 - React Native interactive elements expose stable `testID` and accessible labels/roles.
 - API errors use a consistent response shape.
